@@ -8,5 +8,7 @@ modulate = Color( 0.75, 0.75, 0.75, 1 )
 texture = ExtResource( 1 )
 script = ExtResource( 2 )
 
+[node name="CardBackground" type="Sprite" parent="."]
+
 [node name="CardValue" type="Sprite" parent="."]
 modulate = Color( 2, 2, 2, 1 )
