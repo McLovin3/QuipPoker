@@ -1,21 +1,11 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Card/Card.tscn" type="PackedScene" id=1]
 [ext_resource path="res://GlowEffect.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Card/Sprites/Clubs/SevenOfClubs.png" type="Texture" id=3]
-[ext_resource path="res://Card/Sprites/CardBackDetails.png" type="Texture" id=4]
-[ext_resource path="res://Card/Sprites/Clubs/QueenOfClubs.png" type="Texture" id=5]
-[ext_resource path="res://Card/Sprites/Hearts/TwoOfHearts.png" type="Texture" id=6]
-[ext_resource path="res://Card/Sprites/Hearts/KingOfHearts.png" type="Texture" id=7]
-[ext_resource path="res://Card/Sprites/Spades/FourOfSpades.png" type="Texture" id=8]
-[ext_resource path="res://Card/Sprites/Diamonds/JackOfDiamonds.png" type="Texture" id=9]
-[ext_resource path="res://Card/Sprites/Hearts/AceOfHearts.png" type="Texture" id=10]
-[ext_resource path="res://Card/Sprites/Faces/Queen.png" type="Texture" id=11]
+[ext_resource path="res://Card/Sprites/Hearts/EightOfHearts.png" type="Texture" id=3]
+[ext_resource path="res://Card/Sprites/Clubs/ThreeOfClubs.png" type="Texture" id=4]
 [ext_resource path="res://Card/Sprites/Spades/JackOfSpades.png" type="Texture" id=12]
-[ext_resource path="res://Card/Sprites/Faces/King.png" type="Texture" id=13]
 [ext_resource path="res://Card/Sprites/Faces/Jack.png" type="Texture" id=14]
-[ext_resource path="res://Card/Sprites/Hearts/QueenOfHearts.png" type="Texture" id=15]
-[ext_resource path="res://Card/Sprites/CardBack.png" type="Texture" id=16]
 
 [node name="Node2D" type="Node2D"]
 
@@ -23,52 +13,16 @@
 current = true
 zoom = Vector2( 0.5, 0.5 )
 
+[node name="Node2D" parent="." instance=ExtResource( 1 )]
+card_foreground = ExtResource( 3 )
+
 [node name="WorldEnvironment" parent="." instance=ExtResource( 2 )]
 
-[node name="Cards" type="Node2D" parent="."]
-
-[node name="KingOfSpades" parent="Cards" instance=ExtResource( 1 )]
-position = Vector2( -192, -86 )
-card_value = ExtResource( 7 )
-card_background = ExtResource( 13 )
-
-[node name="JackOfDiamonds" parent="Cards" instance=ExtResource( 1 )]
-position = Vector2( -96, -86 )
-card_value = ExtResource( 9 )
+[node name="Jack" parent="." instance=ExtResource( 1 )]
+position = Vector2( -96, 0 )
+card_foreground = ExtResource( 12 )
 card_background = ExtResource( 14 )
 
-[node name="JackOfSpades" parent="Cards" instance=ExtResource( 1 )]
-position = Vector2( 0, -86 )
-card_value = ExtResource( 12 )
-card_background = ExtResource( 14 )
-
-[node name="SevenOfClubs" parent="Cards" instance=ExtResource( 1 )]
-position = Vector2( 96, -86 )
-card_value = ExtResource( 3 )
-
-[node name="QueenOfHearts" parent="Cards" instance=ExtResource( 1 )]
-position = Vector2( 192, -86 )
-card_value = ExtResource( 15 )
-card_background = ExtResource( 11 )
-
-[node name="QueenOfClubs" parent="Cards" instance=ExtResource( 1 )]
-position = Vector2( -192, 20 )
-card_value = ExtResource( 5 )
-card_background = ExtResource( 11 )
-
-[node name="FourOfSpades" parent="Cards" instance=ExtResource( 1 )]
-position = Vector2( -96, 20 )
-card_value = ExtResource( 8 )
-
-[node name="CardBack" parent="Cards" instance=ExtResource( 1 )]
-position = Vector2( 0, 20 )
-card_value = ExtResource( 4 )
-card_background = ExtResource( 16 )
-
-[node name="TwoOfHearts" parent="Cards" instance=ExtResource( 1 )]
-position = Vector2( 96, 20 )
-card_value = ExtResource( 6 )
-
-[node name="AceOfHearts" parent="Cards" instance=ExtResource( 1 )]
-position = Vector2( 192, 20 )
-card_value = ExtResource( 10 )
+[node name="Node2D" parent="Jack" instance=ExtResource( 1 )]
+position = Vector2( 256, 0 )
+card_foreground = ExtResource( 4 )
