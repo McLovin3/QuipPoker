@@ -14,4 +14,4 @@ texture = ExtResource( 1 )
 modulate = Color( 0.5, 0.5, 0.5, 1 )
 
 [node name="CardForeground" type="Sprite" parent="."]
-modulate = Color( 1.2, 1.2, 1.2, 1 )
+modulate = Color( 2.5, 2.5, 2.5, 1 )

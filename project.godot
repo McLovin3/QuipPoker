@@ -11,9 +11,18 @@ config_version=4
 [application]
 
 config/name="QuipPoker"
-run/main_scene="res://MainScene.tscn"
+run/main_scene="res://MainMenu.tscn"
 boot_splash/bg_color=Color( 0.141176, 0.141176, 0.141176, 1 )
 config/icon="res://icon.png"
+
+[autoload]
+
+GlowEffect="*res://GlowEffect.tscn"
+
+[display]
+
+window/size/width=960
+window/size/height=540
 
 [gui]
 
@@ -25,7 +34,6 @@ common/enable_pause_aware_picking=true
 
 [rendering]
 
-quality/driver/driver_name="GLES2"
 vram_compression/import_etc=true
 vram_compression/import_etc2=false
 environment/default_clear_color=Color( 0, 0.00784314, 0.129412, 1 )

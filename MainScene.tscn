@@ -1,11 +1,8 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Card/Card.tscn" type="PackedScene" id=1]
 [ext_resource path="res://GlowEffect.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Card/Sprites/Hearts/EightOfHearts.png" type="Texture" id=3]
-[ext_resource path="res://Card/Sprites/Clubs/ThreeOfClubs.png" type="Texture" id=4]
-[ext_resource path="res://Card/Sprites/Spades/JackOfSpades.png" type="Texture" id=12]
-[ext_resource path="res://Card/Sprites/Faces/Jack.png" type="Texture" id=14]
+[ext_resource path="res://Card/Sprites/Hearts/AceOfHearts.png" type="Texture" id=10]
 
 [node name="Node2D" type="Node2D"]
 
@@ -14,15 +11,7 @@ current = true
 zoom = Vector2( 0.5, 0.5 )
 
 [node name="Node2D" parent="." instance=ExtResource( 1 )]
-card_foreground = ExtResource( 3 )
+position = Vector2( -128, -32 )
+card_foreground = ExtResource( 10 )
 
 [node name="WorldEnvironment" parent="." instance=ExtResource( 2 )]
-
-[node name="Jack" parent="." instance=ExtResource( 1 )]
-position = Vector2( -96, 0 )
-card_foreground = ExtResource( 12 )
-card_background = ExtResource( 14 )
-
-[node name="Node2D" parent="Jack" instance=ExtResource( 1 )]
-position = Vector2( 256, 0 )
-card_foreground = ExtResource( 4 )
