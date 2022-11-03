@@ -11,28 +11,29 @@ var _shake_count: int
 
 
 func _shake_username_input() -> void:
-	var side = 1 if _shake_count % 2 == 0 else -1
+	if _shake_count > 0:
+		var side = 1 if _shake_count % 2 == 0 else -1
 
-	if _shake_count == 1 or _shake_count == nb_shakes:
-		_username_input_tween.interpolate_property(
-			_username_input,
-			"rect_position:x",
-			_username_input.rect_position.x,
-			_username_input.rect_position.x + (shake_distance * side),
-			tween_duration
-		)
+		if _shake_count == 1 or _shake_count == nb_shakes:
+			_username_input_tween.interpolate_property(
+				_username_input,
+				"rect_position:x",
+				_username_input.rect_position.x,
+				_username_input.rect_position.x + (shake_distance * side),
+				tween_duration
+			)
 
-	else:
-		_username_input_tween.interpolate_property(
-			_username_input,
-			"rect_position:x",
-			_username_input.rect_position.x,
-			_username_input.rect_position.x + (shake_distance * 2 * side),
-			tween_duration
-		)
+		else:
+			_username_input_tween.interpolate_property(
+				_username_input,
+				"rect_position:x",
+				_username_input.rect_position.x,
+				_username_input.rect_position.x + (shake_distance * 2 * side),
+				tween_duration
+			)
 
-	_username_input_tween.start()
-	_shake_count -= 1
+		_username_input_tween.start()
+		_shake_count -= 1
 
 
 func _on_HostButton_pressed() -> void:
@@ -52,5 +53,4 @@ func _on_JoinButton_pressed() -> void:
 
 
 func _on_Tween_tween_all_completed() -> void:
-	if _shake_count > 0:
-		_shake_username_input()
+	_shake_username_input()
