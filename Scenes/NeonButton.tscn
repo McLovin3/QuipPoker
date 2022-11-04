@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Themes/ButtonTheme.tres" type="Theme" id=1]
+
+[node name="NeonButton" type="Button"]
+modulate = Color( 1.5, 1.5, 1.5, 1 )
+margin_right = 200.0
+margin_bottom = 50.0
+theme = ExtResource( 1 )

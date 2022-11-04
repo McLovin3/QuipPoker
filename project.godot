@@ -8,16 +8,26 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "LineEdit",
+"class": "ShakingInput",
+"language": "GDScript",
+"path": "res://Scenes/Scripts/ShakingInput.gd"
+} ]
+_global_script_class_icons={
+"ShakingInput": ""
+}
+
 [application]
 
 config/name="QuipPoker"
-run/main_scene="res://MainMenu.tscn"
+run/main_scene="res://Scenes/MainMenu.tscn"
 boot_splash/bg_color=Color( 0.141176, 0.141176, 0.141176, 1 )
 config/icon="res://icon.png"
 
 [autoload]
 
-GlowEffect="*res://GlowEffect.tscn"
+GlowEffect="*res://Scenes/GlowEffect.tscn"
 
 [debug]
 
