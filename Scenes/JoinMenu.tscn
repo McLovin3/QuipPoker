@@ -27,4 +27,16 @@ margin_right = 144.0
 margin_bottom = -14.0
 placeholder_text = "Address"
 
+[node name="JoinButton" parent="CanvasLayer" instance=ExtResource( 2 )]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -100.0
+margin_top = 18.0
+margin_right = 100.0
+margin_bottom = 68.0
+text = "Join"
+
 [connection signal="pressed" from="CanvasLayer/GoBackButton" to="." method="_on_GoBackButton_pressed"]
+[connection signal="pressed" from="CanvasLayer/JoinButton" to="." method="_on_JoinButton_pressed"]
