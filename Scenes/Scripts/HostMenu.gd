@@ -26,8 +26,7 @@ func _player_connected(username: String, _isHost: bool) -> void:
 
 
 func _on_GoBackButton_pressed():
-	get_tree().network_peer.close_connection()
-	print(get_tree().network_peer)
+	GameManager.close_server()
 	get_tree().change_scene("res://Scenes/MainMenu.tscn")
 
 

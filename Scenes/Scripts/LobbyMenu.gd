@@ -14,6 +14,7 @@ func _ready():
 
 
 func _lobby_closed() -> void:
+	GameManager.close_client()
 	get_tree().change_scene("res://Scenes/JoinMenu.tscn")
 
 
@@ -31,5 +32,5 @@ func _player_connected(username: String, isHost: bool) -> void:
 
 
 func _on_ExitButton_pressed() -> void:
-	GameManager.close_server()
+	GameManager.close_client()
 	get_tree().change_scene("res://Scenes/JoinMenu.tscn")
