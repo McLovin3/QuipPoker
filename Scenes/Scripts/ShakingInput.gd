@@ -15,7 +15,10 @@ func shake() -> void:
 	if not _shaking:
 		_shake_count = nb_shakes
 		_shaking = true
+		_move_tween()
 
+
+func _move_tween() -> void:
 	if _shake_count > 0:
 		var side = 1 if _shake_count % 2 == 0 else -1
 
@@ -41,8 +44,10 @@ func shake() -> void:
 		_shake_count -= 1
 
 	else:
+		print("Shaking done")
 		_shaking = false
 
 
 func _on_Tween_tween_all_completed() -> void:
-	shake()
+	print("tween completed" + str(_shake_count))
+	_move_tween()
