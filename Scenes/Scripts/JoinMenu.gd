@@ -12,4 +12,4 @@ func _on_JoinButton_pressed():
 	if _ip_input.text == "":
 		_ip_input.shake()
 	else:
-		pass
+		GameManager.join_server(_ip_input.text)

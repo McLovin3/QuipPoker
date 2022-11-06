@@ -4,7 +4,7 @@
 [ext_resource path="res://Scenes/NeonButton.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Scenes/Scripts/JoinMenu.gd" type="Script" id=3]
 
-[node name="CanvasLayer" type="CanvasLayer"]
+[node name="CanvasLayer2" type="CanvasLayer"]
 script = ExtResource( 3 )
 
 [node name="GoBackButton" parent="." instance=ExtResource( 2 )]
@@ -34,6 +34,7 @@ margin_left = -144.0
 margin_top = -78.0
 margin_right = 144.0
 margin_bottom = -14.0
+max_length = 15
 placeholder_text = "Address"
 
 [connection signal="pressed" from="GoBackButton" to="." method="_on_GoBackButton_pressed"]
