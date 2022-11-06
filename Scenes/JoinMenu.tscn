@@ -37,5 +37,9 @@ margin_bottom = -14.0
 max_length = 15
 placeholder_text = "Address"
 
+[node name="ProgressBar" type="ProgressBar" parent="."]
+margin_right = 4.0
+margin_bottom = 20.0
+
 [connection signal="pressed" from="GoBackButton" to="." method="_on_GoBackButton_pressed"]
 [connection signal="pressed" from="JoinButton" to="." method="_on_JoinButton_pressed"]

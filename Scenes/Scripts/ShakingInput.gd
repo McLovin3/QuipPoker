@@ -44,10 +44,8 @@ func _move_tween() -> void:
 		_shake_count -= 1
 
 	else:
-		print("Shaking done")
 		_shaking = false
 
 
 func _on_Tween_tween_all_completed() -> void:
-	print("tween completed" + str(_shake_count))
 	_move_tween()
