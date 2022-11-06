@@ -1,6 +1,6 @@
 extends Node2D
 
-signal player_joined(username)
+signal player_joined(username, isHost)
 signal player_left(username)
 
 export var port: int = 7777
@@ -55,7 +55,7 @@ func close_server() -> void:
 
 remote func _register_player(username: String) -> void:
 	players[get_tree().get_rpc_sender_id()] = username
-	emit_signal("player_joined", username)
+	emit_signal("player_joined", username, get_tree().get_rpc_sender_id() == 1)
 
 
 # Client functions

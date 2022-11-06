@@ -13,20 +13,23 @@ func _ready():
 	_names.append(GameManager.get_username())
 
 
-func _lobby_closed():
+func _lobby_closed() -> void:
 	get_tree().change_scene("res://Scenes/JoinMenu.tscn")
 
 
-func _player_disconnected(username: String):
+func _player_disconnected(username: String) -> void:
 	_name_list.remove_item(_names.find(username))
 	_names.remove(_names.find(username))
 
 
-func _player_connected(username: String) -> void:
-	_name_list.add_item(username, null, false)
+func _player_connected(username: String, isHost: bool) -> void:
+	if isHost:
+		_name_list.add_item(username + " (Host)", null, false)
+	else:
+		_name_list.add_item(username, null, false)
 	_names.append(username)
 
 
-func _on_ExitButton_pressed():
+func _on_ExitButton_pressed() -> void:
 	GameManager.close_server()
 	get_tree().change_scene("res://Scenes/JoinMenu.tscn")
