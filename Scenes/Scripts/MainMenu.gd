@@ -12,8 +12,8 @@ func _on_HostButton_pressed() -> void:
 	if _username_input.text == "":
 		_username_input.shake()
 	else:
-		GameManager.set_username(_username_input.text)
 		GameManager.create_server()
+		GameManager.set_username(_username_input.text)
 		get_tree().change_scene("res://Scenes/HostMenu.tscn")
 
 

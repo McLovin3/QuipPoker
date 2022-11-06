@@ -10,6 +10,7 @@ func _ready():
 
 
 func _on_GoBackButton_pressed():
+	GameManager.close_client()
 	get_tree().change_scene("res://Scenes/MainMenu.tscn")
 
 
