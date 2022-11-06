@@ -20,7 +20,7 @@ func _player_disconnected(username: String):
 	_names.remove(_names.find(username))
 
 
-func _player_connected(username: String) -> void:
+func _player_connected(username: String, _isHost: bool) -> void:
 	_name_list.add_item(username, null, false)
 	_names.append(username)
 

@@ -69,7 +69,7 @@ func join_server(ip_address: String) -> void:
 
 
 func _connected_to_server() -> void:
-	get_tree().change_scene("res://scenes/LobbyMenu.tscn")
+	get_tree().change_scene("res://Scenes/LobbyMenu.tscn")
 
 
 func close_client() -> void:
