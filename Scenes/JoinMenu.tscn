@@ -4,30 +4,17 @@
 [ext_resource path="res://Scenes/NeonButton.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Scenes/Scripts/JoinMenu.gd" type="Script" id=3]
 
-[node name="Node2D" type="Node2D"]
+[node name="CanvasLayer" type="CanvasLayer"]
 script = ExtResource( 3 )
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
-
-[node name="GoBackButton" parent="CanvasLayer" instance=ExtResource( 2 )]
+[node name="GoBackButton" parent="." instance=ExtResource( 2 )]
 margin_left = 32.0
 margin_top = 32.0
 margin_right = 232.0
 margin_bottom = 82.0
 text = "Go Back"
 
-[node name="IpInput" parent="CanvasLayer" instance=ExtResource( 1 )]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -144.0
-margin_top = -78.0
-margin_right = 144.0
-margin_bottom = -14.0
-placeholder_text = "Address"
-
-[node name="JoinButton" parent="CanvasLayer" instance=ExtResource( 2 )]
+[node name="JoinButton" parent="." instance=ExtResource( 2 )]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -38,5 +25,16 @@ margin_right = 100.0
 margin_bottom = 68.0
 text = "Join"
 
-[connection signal="pressed" from="CanvasLayer/GoBackButton" to="." method="_on_GoBackButton_pressed"]
-[connection signal="pressed" from="CanvasLayer/JoinButton" to="." method="_on_JoinButton_pressed"]
+[node name="IpInput" parent="." instance=ExtResource( 1 )]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -144.0
+margin_top = -78.0
+margin_right = 144.0
+margin_bottom = -14.0
+placeholder_text = "Address"
+
+[connection signal="pressed" from="GoBackButton" to="." method="_on_GoBackButton_pressed"]
+[connection signal="pressed" from="JoinButton" to="." method="_on_JoinButton_pressed"]

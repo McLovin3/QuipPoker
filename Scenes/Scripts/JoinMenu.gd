@@ -1,6 +1,7 @@
-extends Node2D
+extends CanvasLayer
+class_name JoinMenu
 
-onready var _ip_input: ShakingInput = $CanvasLayer/IpInput
+onready var _ip_input: ShakingInput = $IpInput
 
 
 func _on_GoBackButton_pressed():

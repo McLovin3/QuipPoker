@@ -1,5 +1,5 @@
 extends CanvasLayer
-class_name HostingMenu
+class_name HostMenu
 
 
 func _on_GoBackButton_pressed():
