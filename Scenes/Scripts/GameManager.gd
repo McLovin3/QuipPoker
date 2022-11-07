@@ -3,7 +3,7 @@ extends Node2D
 signal player_joined(username, isHost)
 signal player_left(username)
 
-export var port: int = 7777
+export var port: int = 45555
 export var max_clients: int = 6
 
 onready var _connection_timer: Timer = $ConnectionTimer
