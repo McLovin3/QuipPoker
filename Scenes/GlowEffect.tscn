@@ -2,8 +2,11 @@
 
 [sub_resource type="Environment" id=1]
 background_mode = 4
+background_canvas_max_layer = 1
 glow_enabled = true
-glow_hdr_scale = 0.9
+glow_intensity = 1.25
+glow_strength = 0.75
+glow_blend_mode = 1
 
 [node name="WorldEnvironment" type="WorldEnvironment"]
 environment = SubResource( 1 )
