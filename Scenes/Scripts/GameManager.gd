@@ -13,7 +13,6 @@ var _username: String = "" setget set_username, get_username
 var _ip_address: String = "" setget , get_ip_address
 var players: Dictionary = {}
 
-
 func _ready():
 	match OS.get_name():
 		"Windows":
