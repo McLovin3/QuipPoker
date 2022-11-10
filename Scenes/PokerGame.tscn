@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://Scenes/Scripts/PokerGame.gd" type="Script" id=1]
+[ext_resource path="res://Scenes/NeonButton.tscn" type="PackedScene" id=2]
 
 [node name="CanvasLayer" type="CanvasLayer"]
 script = ExtResource( 1 )
@@ -25,3 +26,28 @@ position = Vector2( 540, 480 )
 
 [node name="PlayerCard2" type="Position2D" parent="."]
 position = Vector2( 420, 480 )
+
+[node name="FoldButton" parent="." instance=ExtResource( 2 )]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -240.0
+margin_top = -60.0
+margin_right = -40.0
+margin_bottom = -10.0
+text = "FOLD"
+
+[node name="CheckButton" parent="." instance=ExtResource( 2 )]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -240.0
+margin_top = -120.0
+margin_right = -40.0
+margin_bottom = -70.0
+text = "CHECK"
+
+[connection signal="pressed" from="FoldButton" to="." method="_on_FoldButton_pressed"]
+[connection signal="pressed" from="CheckButton" to="." method="_on_PassButton_pressed"]

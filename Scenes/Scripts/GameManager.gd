@@ -76,6 +76,7 @@ func _ready():
 	for value in CardValues.values():
 		_deck.append(value)
 
+	randomize()
 	_deck.shuffle()
 
 	match OS.get_name():

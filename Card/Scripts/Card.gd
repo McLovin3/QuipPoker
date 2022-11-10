@@ -4,7 +4,7 @@ class_name Card
 onready var _card_foreground_sprite: Sprite = $CardForeground
 onready var _card_background_sprite: Sprite = $CardBackground
 
-var _heart_path: String = "res://Card/Sprites/Hearts.png"
+var _heart_path: String = "res://Card/Sprites/Hearts/"
 var _diamond_path: String = "res://Card/Sprites/Diamonds/"
 var _spade_path: String = "res://Card/Sprites/Spades/"
 var _club_path: String = "res://Card/Sprites/Clubs/"
@@ -12,11 +12,14 @@ var _faces_path: String = "res://Card/Sprites/Faces/"
 
 
 func set_card_value(cardValue: int) -> void:
+	_card_foreground_sprite.texture = null
+	_card_background_sprite.texture = null
+
 	match cardValue:
 		GameManager.CardValues.ACE_OF_HEARTS:
 			_card_foreground_sprite.texture = load(_heart_path + "AceOfHearts.png")
 		GameManager.CardValues.TWO_OF_HEARTS:
-			_card_foreground_sprite.texture = load(_heart_path + "TwoOfHeats.png")
+			_card_foreground_sprite.texture = load(_heart_path + "TwoOfHearts.png")
 		GameManager.CardValues.THREE_OF_HEARTS:
 			_card_foreground_sprite.texture = load(_heart_path + "ThreeOfHearts.png")
 		GameManager.CardValues.FOUR_OF_HEARTS:
