@@ -6,15 +6,15 @@ var _names: PoolStringArray = []
 
 
 func _ready():
-	GameManager.connect("player_joined", self, "_player_connected")
-	GameManager.connect("player_left", self, "_player_disconnected")
+	NetworkManager.connect("player_joined", self, "_player_connected")
+	NetworkManager.connect("player_left", self, "_player_disconnected")
 	get_tree().connect("server_disconnected", self, "_lobby_closed")
-	_name_list.add_item(GameManager.get_username() + " (You)", null, false)
-	_names.append(GameManager.get_username())
+	_name_list.add_item(NetworkManager.get_username() + " (You)", null, false)
+	_names.append(NetworkManager.get_username())
 
 
 func _lobby_closed() -> void:
-	GameManager.close_client()
+	NetworkManager.close_client()
 	get_tree().change_scene("res://Scenes/JoinMenu.tscn")
 
 
@@ -32,5 +32,5 @@ func _player_connected(username: String, isHost: bool) -> void:
 
 
 func _on_ExitButton_pressed() -> void:
-	GameManager.close_client()
+	NetworkManager.close_client()
 	get_tree().change_scene("res://Scenes/JoinMenu.tscn")

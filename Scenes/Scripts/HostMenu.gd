@@ -8,11 +8,11 @@ var _names: PoolStringArray = []
 
 
 func _ready():
-	GameManager.connect("player_joined", self, "_player_connected")
-	GameManager.connect("player_left", self, "_player_disconnected")
-	_ip_address_label.text = "IP Address: " + GameManager.get_ip_address()
-	_name_list.add_item(GameManager.get_username() + " (You) (Host)", null, false)
-	_names.append(GameManager.get_username())
+	NetworkManager.connect("player_joined", self, "_player_connected")
+	NetworkManager.connect("player_left", self, "_player_disconnected")
+	_ip_address_label.text = "IP Address: " + NetworkManager.get_ip_address()
+	_name_list.add_item(NetworkManager.get_username() + " (You) (Host)", null, false)
+	_names.append(NetworkManager.get_username())
 
 
 func _player_disconnected(username: String):
@@ -26,7 +26,7 @@ func _player_connected(username: String, _isHost: bool) -> void:
 
 
 func _on_GoBackButton_pressed():
-	GameManager.close_server()
+	NetworkManager.close_server()
 	get_tree().change_scene("res://Scenes/MainMenu.tscn")
 
 

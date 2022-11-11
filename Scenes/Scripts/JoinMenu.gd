@@ -10,7 +10,7 @@ func _ready():
 
 
 func _on_GoBackButton_pressed():
-	GameManager.close_client()
+	NetworkManager.close_client()
 	get_tree().change_scene("res://Scenes/MainMenu.tscn")
 
 
@@ -18,7 +18,7 @@ func _on_JoinButton_pressed():
 	if _ip_input.text.is_valid_ip_address():
 		_ip_input.editable = false
 		_join_button.disabled = true
-		GameManager.join_server(_ip_input.text)
+		NetworkManager.join_server(_ip_input.text)
 	else:
 		_ip_input.shake()
 
