@@ -9,6 +9,7 @@ var _deck: Array = []
 func _ready():
 	new_deck()
 
+
 func new_deck() -> void:
 	_deck.clear()
 	for suit in Suits.values():
@@ -17,6 +18,7 @@ func new_deck() -> void:
 
 	randomize()
 	_deck.shuffle()
+
 
 func get_next_card() -> Dictionary:
 	return _deck.pop_front()

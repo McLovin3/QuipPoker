@@ -49,5 +49,8 @@ margin_right = -40.0
 margin_bottom = -70.0
 text = "CHECK"
 
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+
 [connection signal="pressed" from="FoldButton" to="." method="_on_FoldButton_pressed"]
 [connection signal="pressed" from="CheckButton" to="." method="_on_PassButton_pressed"]
+[connection signal="request_completed" from="HTTPRequest" to="." method="_on_HTTPRequest_request_completed"]
