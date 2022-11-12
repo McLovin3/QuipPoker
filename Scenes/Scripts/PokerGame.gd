@@ -2,6 +2,7 @@ extends CanvasLayer
 class_name PokerGame
 
 var _card: PackedScene = preload("res://Card/Card.tscn")
+onready var _new_game_timer: Timer = $NewGameTimer
 onready var _first_table_position: Position2D = $TableCard1
 onready var _second_table_position: Position2D = $TableCard2
 onready var _third_table_position: Position2D = $TableCard3
@@ -64,6 +65,7 @@ func _ready():
 func _init_table() -> void:
 	GameManager.new_deck()
 	_check_button.disabled = false
+	_fold_button.disabled = false
 	_player_cards.clear()
 	_table_cards.clear()
 	_turn = 1
@@ -71,15 +73,8 @@ func _init_table() -> void:
 	_create_table_cards()
 	_create_player_cards()
 
-	print(_player_cards)
-	print(_table_cards)
 
-
-func _on_FoldButton_pressed():
-	for card in _table_cards:
-		if card.is_face_down():
-			card.flip_card()
-
+func _determine_winner():
 	var _player_cards_values = ""
 
 	for i in range(_player_cards.size()):
@@ -96,7 +91,7 @@ func _on_FoldButton_pressed():
 		else:
 			_table_cards_values += _table_cards[i].get_api_value() + ","
 
-	$HTTPRequest.request(
+	_http_request.request(
 		(
 			"https://api.pokerapi.dev/v1/winner/texas_holdem?cc="
 			+ _table_cards_values
@@ -105,9 +100,17 @@ func _on_FoldButton_pressed():
 		)
 	)
 
+	_fold_button.disabled = true
+	_check_button.disabled = true
+	_new_game_timer.start()
 
-func _on_PassButton_pressed():
-	pass
+
+func _on_FoldButton_pressed():
+	for card in _table_cards:
+		if card.is_face_down():
+			card.flip_card()
+
+	_determine_winner()
 
 
 func _on_HTTPRequest_request_completed(
@@ -115,3 +118,19 @@ func _on_HTTPRequest_request_completed(
 ) -> void:
 	var json = JSON.parse(body.get_string_from_utf8())
 	print(json.result)
+
+
+func _on_NewGameTimer_timeout():
+	_init_table()
+
+
+func _on_CheckButton_pressed():
+	if _turn < 4:
+		for card in _table_cards:
+			if card.is_face_down():
+				card.flip_card()
+				_turn += 1
+				return
+
+	else:
+		_determine_winner()

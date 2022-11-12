@@ -51,6 +51,11 @@ text = "CHECK"
 
 [node name="HTTPRequest" type="HTTPRequest" parent="."]
 
+[node name="NewGameTimer" type="Timer" parent="."]
+wait_time = 5.0
+one_shot = true
+
 [connection signal="pressed" from="FoldButton" to="." method="_on_FoldButton_pressed"]
-[connection signal="pressed" from="CheckButton" to="." method="_on_PassButton_pressed"]
+[connection signal="pressed" from="CheckButton" to="." method="_on_CheckButton_pressed"]
 [connection signal="request_completed" from="HTTPRequest" to="." method="_on_HTTPRequest_request_completed"]
+[connection signal="timeout" from="NewGameTimer" to="." method="_on_NewGameTimer_timeout"]
