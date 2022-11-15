@@ -14,7 +14,7 @@ func _on_HostButton_pressed() -> void:
 	else:
 		NetworkManager.create_server()
 		NetworkManager.set_username(_username_input.text)
-		get_tree().change_scene("res://Scenes/HostMenu.tscn")
+		get_tree().change_scene("res://Scenes/LobbyMenu.tscn")
 
 
 func _on_JoinButton_pressed() -> void:
