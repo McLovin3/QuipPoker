@@ -5,6 +5,7 @@ var _card: PackedScene = preload("res://Card/Card.tscn")
 onready var _name_list: ItemList = $NameList
 onready var _new_game_timer: Timer = $NewGameTimer
 onready var _turn_timer: Timer = $TurnTimer
+#Card position
 onready var _first_table_position: Position2D = $TableCard1
 onready var _second_table_position: Position2D = $TableCard2
 onready var _third_table_position: Position2D = $TableCard3
@@ -77,11 +78,11 @@ mastersync func _send_action(action: int):
 		_turn += 1
 		_table_cards.append(GameManager.get_next_card())
 		rpc("_set_table_cards", _table_cards)
-		
+
 		if _turn == 4:
 			rpc("_disable_buttons")
 			_determine_winner()
-			
+
 		else:
 			_current_player = 0
 			rpc_id(_players.keys()[_current_player], "_set_turn")
@@ -89,8 +90,6 @@ mastersync func _send_action(action: int):
 	else:
 		_current_player += 1
 		rpc_id(_players.keys()[_current_player], "_set_turn")
-	
-
 
 
 # Client Functions
@@ -132,7 +131,7 @@ puppetsync func _set_turn():
 func _on_TurnTimer_timeout():
 	_check_button.disabled = true
 	_fold_button.disabled = true
-	rpc("_send_action", Plays.CHECK)
+	rpc("_send_action", Plays.Fold)
 
 
 func _on_FoldButton_pressed():
@@ -174,7 +173,7 @@ func _determine_winner():
 		player_hands += "&pc[]="
 		for card in _players[player]["cards"]:
 			player_hands += card + ","
-	
+
 	_http_request.request(
 		(
 			"https://api.pokerapi.dev/v1/winner/texas_holdem?cc="
@@ -193,5 +192,8 @@ func _on_HTTPRequest_request_completed(
 	print(_players)
 
 	for player_id in _players.keys():
-		if winner["cards"].split(",")[0] == _players[player_id]["cards"][0] and winner["cards"].split(",")[1] == _players[player_id]["cards"][1]:
+		if (
+			winner["cards"].split(",")[0] == _players[player_id]["cards"][0]
+			and winner["cards"].split(",")[1] == _players[player_id]["cards"][1]
+		):
 			print(NetworkManager.players.get(player_id) + " won with a " + winner["result"])
