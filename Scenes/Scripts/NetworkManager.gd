@@ -9,7 +9,7 @@ export var max_clients: int = 6
 onready var _connection_timer: Timer = $ConnectionTimer
 
 var _peer: NetworkedMultiplayerENet
-var _username: String = "" setget set_username, get_username
+var _username: String = "Joe Biden" setget set_username, get_username
 var _ip_address: String = "" setget , get_ip_address
 var players: Dictionary = {}
 
@@ -28,6 +28,7 @@ func _ready():
 	get_tree().connect("network_peer_disconnected", self, "_player_disconnected")
 
 	#Client signals
+	get_tree().connect("server_disconnected", self, "_lobby_closed")
 	get_tree().connect("connected_to_server", self, "_connected_to_server")
 
 
@@ -36,6 +37,7 @@ func create_server() -> void:
 	_peer = NetworkedMultiplayerENet.new()
 	_peer.create_server(port, max_clients)
 	get_tree().set_network_peer(_peer)
+	players[1] = _username
 
 
 func _player_connected(id: int) -> void:
@@ -51,6 +53,8 @@ func close_server() -> void:
 	if _peer:
 		_peer.close_connection()
 		get_tree().set_network_peer(null)
+	
+	players.clear()
 
 
 remote func _register_player(username: String) -> void:
@@ -60,6 +64,9 @@ remote func _register_player(username: String) -> void:
 
 # Client functions
 
+func _lobby_closed() -> void:
+	get_tree().change_scene("res://Scenes/LobbyMenu.tscn")
+	NetworkManager.close_client()
 
 func join_server(ip_address: String) -> void:
 	_peer = NetworkedMultiplayerENet.new()
@@ -87,7 +94,6 @@ func get_ip_address() -> String:
 
 func set_username(username: String) -> void:
 	_username = username
-
 
 func get_username() -> String:
 	return _username

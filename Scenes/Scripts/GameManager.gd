@@ -22,3 +22,123 @@ func new_deck() -> void:
 
 func get_next_card() -> Dictionary:
 	return _deck.pop_front()
+
+
+func get_api_value(card_value: Dictionary) -> String:
+	var suit = card_value["suit"]
+	var value = card_value["value"]
+
+	match suit:
+		GameManager.Suits.HEARTS:
+			match value:
+				GameManager.Values.ACE:
+					return "AH"
+				GameManager.Values.TWO:
+					return "2H"
+				GameManager.Values.THREE:
+					return "3H"
+				GameManager.Values.FOUR:
+					return "4H"
+				GameManager.Values.FIVE:
+					return "5H"
+				GameManager.Values.SIX:
+					return "6H"
+				GameManager.Values.SEVEN:
+					return "7H"
+				GameManager.Values.EIGHT:
+					return "8H"
+				GameManager.Values.NINE:
+					return "9H"
+				GameManager.Values.TEN:
+					return "10H"
+				GameManager.Values.JACK:
+					return "JH"
+				GameManager.Values.QUEEN:
+					return "QH"
+				GameManager.Values.KING:
+					return "KH"
+		GameManager.Suits.DIAMONDS:
+			match value:
+				GameManager.Values.ACE:
+					return "AD"
+				GameManager.Values.TWO:
+					return "2D"
+				GameManager.Values.THREE:
+					return "3D"
+				GameManager.Values.FOUR:
+					return "4D"
+				GameManager.Values.FIVE:
+					return "5D"
+				GameManager.Values.SIX:
+					return "6D"
+				GameManager.Values.SEVEN:
+					return "7D"
+				GameManager.Values.EIGHT:
+					return "8D"
+				GameManager.Values.NINE:
+					return "9D"
+				GameManager.Values.TEN:
+					return "10D"
+				GameManager.Values.JACK:
+					return "JD"
+				GameManager.Values.QUEEN:
+					return "QD"
+				GameManager.Values.KING:
+					return "KD"
+		GameManager.Suits.SPADES:
+			match value:
+				GameManager.Values.ACE:
+					return "AS"
+				GameManager.Values.TWO:
+					return "2S"
+				GameManager.Values.THREE:
+					return "3S"
+				GameManager.Values.FOUR:
+					return "4S"
+				GameManager.Values.FIVE:
+					return "5S"
+				GameManager.Values.SIX:
+					return "6S"
+				GameManager.Values.SEVEN:
+					return "7S"
+				GameManager.Values.EIGHT:
+					return "8S"
+				GameManager.Values.NINE:
+					return "9S"
+				GameManager.Values.TEN:
+					return "10S"
+				GameManager.Values.JACK:
+					return "JS"
+				GameManager.Values.QUEEN:
+					return "QS"
+				GameManager.Values.KING:
+					return "KS"
+		GameManager.Suits.CLUBS:
+			match value:
+				GameManager.Values.ACE:
+					return "AC"
+				GameManager.Values.TWO:
+					return "2C"
+				GameManager.Values.THREE:
+					return "3C"
+				GameManager.Values.FOUR:
+					return "4C"
+				GameManager.Values.FIVE:
+					return "5C"
+				GameManager.Values.SIX:
+					return "6C"
+				GameManager.Values.SEVEN:
+					return "7C"
+				GameManager.Values.EIGHT:
+					return "8C"
+				GameManager.Values.NINE:
+					return "9C"
+				GameManager.Values.TEN:
+					return "10C"
+				GameManager.Values.JACK:
+					return "JC"
+				GameManager.Values.QUEEN:
+					return "QC"
+				GameManager.Values.KING:
+					return "KC"
+	return "NA"

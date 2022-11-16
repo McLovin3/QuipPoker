@@ -32,7 +32,6 @@ func set_card_face_down() -> void:
 	_card_foreground_sprite.texture = load("res://Card/Sprites/CardBackDetails.png")
 	_card_background_sprite.texture = load("res://Card/Sprites/CardBack.png")
 
-
 func set_card(card_value: Dictionary) -> void:
 	_card_foreground_sprite.texture = null
 	_card_background_sprite.texture = null

@@ -15,11 +15,6 @@ _global_script_classes=[ {
 "path": "res://Card/Scripts/Card.gd"
 }, {
 "base": "CanvasLayer",
-"class": "HostMenu",
-"language": "GDScript",
-"path": "res://Scenes/Scripts/HostMenu.gd"
-}, {
-"base": "CanvasLayer",
 "class": "JoinMenu",
 "language": "GDScript",
 "path": "res://Scenes/Scripts/JoinMenu.gd"
@@ -46,7 +41,6 @@ _global_script_classes=[ {
 } ]
 _global_script_class_icons={
 "Card": "",
-"HostMenu": "",
 "JoinMenu": "",
 "LobbyMenu": "",
 "MainMenu": "",
@@ -79,6 +73,7 @@ gdscript/warnings/unsafe_call_argument=true
 window/size/width=960
 window/size/height=540
 window/stretch/mode="2d"
+window/stretch/aspect="keep"
 
 [gui]
 

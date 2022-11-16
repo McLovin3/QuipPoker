@@ -22,13 +22,7 @@ func _ready():
 
 	NetworkManager.connect("player_joined", self, "_player_connected")
 	NetworkManager.connect("player_left", self, "_player_disconnected")
-	get_tree().connect("server_disconnected", self, "_lobby_closed")
 	_names.append(NetworkManager.get_username())
-
-
-func _lobby_closed() -> void:
-	NetworkManager.close_client()
-	get_tree().change_scene("res://Scenes/JoinMenu.tscn")
 
 
 func _player_disconnected(username: String) -> void:
@@ -36,8 +30,8 @@ func _player_disconnected(username: String) -> void:
 	_names.remove(_names.find(username))
 
 
-func _player_connected(username: String) -> void:
-	if _is_host:
+func _player_connected(username: String, player_is_host: bool) -> void:
+	if player_is_host:
 		_name_list.add_item(username + " (Host)", null, false)
 	else:
 		_name_list.add_item(username, null, false)
@@ -49,9 +43,13 @@ func _on_ExitButton_pressed() -> void:
 		NetworkManager.close_server()
 	else:
 		NetworkManager.close_client()
-		get_tree().change_scene("res://Scenes/JoinMenu.tscn")
+
+	get_tree().change_scene("res://Scenes/MainMenu.tscn")
+
+
+puppetsync func _start_game() -> void:
+	get_tree().change_scene("res://Scenes/PokerGame.tscn")
 
 
 func _on_StartButton_pressed():
-	if _name_list.get_item_count() > 3:
-		pass
+		rpc("_start_game")
