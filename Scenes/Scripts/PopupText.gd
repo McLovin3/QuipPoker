@@ -1,15 +1,17 @@
 extends Label
 class_name PopupText
 
+const TWEEN_DURATION = 0.8
+
 onready var _tween = $Tween
 onready var _timer = $Timer
 
 
-func display_text(text):
+func display_text(text: String):
+	self.text = text
+	_tween.interpolate_property(self, "percent_visible", 0, 1, TWEEN_DURATION)
 	_timer.start()
-	_tween.interpolate_property(self, percent_visible, 0, 1, _timer.wait_time - 1)
 	_tween.start()
-	text = text
 
 
 func _on_Timer_timeout():
