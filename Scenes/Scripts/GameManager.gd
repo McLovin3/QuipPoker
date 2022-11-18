@@ -1,12 +1,34 @@
 extends Node2D
 
+const INITIAL_POINT_AMOUNT = 1000
+
 enum Suits { HEARTS, DIAMONDS, SPADES, CLUBS }
 enum Values { ACE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING }
 
 var _deck: Array = []
+var player_id_list: Array = []
+var player_info: Dictionary = {}
 
 
-func _ready():
+func change_player_order_clockwise() -> void:
+	player_id_list.push_back(player_id_list.pop_front())
+
+
+func get_player_names() -> Array:
+	var player_names: Array = []
+	for player_id in player_id_list:
+		player_names.append(player_info[player_id].name)
+	return player_names
+
+
+func reinitialise_game_manager() -> void:
+	player_info.clear()
+	player_id_list = NetworkManager.players.keys()
+
+	for id in player_id_list:
+		player_info[id] = {"name": NetworkManager.players.get(id)}
+		player_info[id]["points"] = INITIAL_POINT_AMOUNT
+
 	new_deck()
 
 
