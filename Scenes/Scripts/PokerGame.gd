@@ -156,11 +156,13 @@ puppetsync func _set_player_cards(player_values: Array) -> void:
 
 func _on_FoldButton_pressed():
 	_disable_buttons()
+	_popup_text.display_text("Folded")
 	rpc("_send_action", Plays.FOLD)
 
 
 func _on_CheckButton_pressed():
 	_disable_buttons()
+	_popup_text.display_text("Checked")
 	rpc("_send_action", Plays.CHECK)
 
 
