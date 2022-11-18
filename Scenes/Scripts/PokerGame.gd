@@ -80,6 +80,12 @@ mastersync func _send_action(action: int):
 		Plays.FOLD:
 			GameManager.player_info.get(id)["action"] = Plays.FOLD
 			rpc("_set_player_action", _get_current_player_name(), "fold")
+
+			if _is_turn_over():
+				_players.erase(id)
+				_turn_over()
+				return
+
 			_players.erase(id)
 			if _players.size() == 1:
 				rpc("_disable_buttons")
@@ -93,9 +99,6 @@ mastersync func _send_action(action: int):
 						+ " chips!"
 					)
 				)
-
-			elif _is_turn_over():
-				_turn_over()
 
 			else:
 				rpc_id(_players[_current_player], "_set_turn")
