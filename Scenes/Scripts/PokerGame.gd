@@ -67,11 +67,13 @@ func _initialise_players() -> void:
 		if GameManager.player_info.get(id)["chips"] >= ROUND_FEE_AMOUNT:
 			GameManager.player_info.get(id)["chips"] -= ROUND_FEE_AMOUNT
 			_pot += ROUND_FEE_AMOUNT
+			rpc("_set_pot_amount", _pot)
 		else:
+			_pot += GameManager.player_info.get(id)["chips"]
 			GameManager.player_info.get(id)["chips"] = 0
 			GameManager.player_info.get(id)["action"] = Plays.ALL_IN
-			_pot += GameManager.player_info.get(id)["chips"]
-		rpc("_set_pot_amount", _pot)
+			rpc("_set_pot_amount", _pot)
+
 		rpc("_set_chip_count", GameManager.player_info.get(id)["chips"])
 		GameManager.player_info[id]["cards"] = [
 			GameManager.get_api_value(player_cards[0]), GameManager.get_api_value(player_cards[1])
@@ -161,13 +163,15 @@ mastersync func _send_action(action: int, bet_amount: int):
 			GameManager.player_info[id]["action"] = Plays.ALL_IN
 			GameManager.player_info[id]["chips"] = 0
 			rpc("_set_player_action", _get_current_player_name(), "All In")
-			rpc("_set_pot_amount", bet_amount)
+			_pot += bet_amount
+			rpc("_set_pot_amount", _pot)
 
 		Plays.RAISE:
 			GameManager.player_info[id]["action"] = Plays.RAISE
 			GameManager.player_info[id]["chips"] -= bet_amount
 			rpc("_set_player_action", _get_current_player_name(), "bet " + str(bet_amount))
-			rpc("_set_pot_amount", bet_amount)
+			_pot += bet_amount
+			rpc("_set_pot_amount", _pot)
 			_last_betting_player = id
 			_last_bet_amount = bet_amount
 
@@ -175,13 +179,15 @@ mastersync func _send_action(action: int, bet_amount: int):
 			GameManager.player_info[id]["action"] = Plays.CALL
 			GameManager.player_info[id]["chips"] -= bet_amount
 			rpc("_set_player_action", _get_current_player_name(), "call")
-			rpc("_set_pot_amount", bet_amount)
+			_pot += bet_amount
+			rpc("_set_pot_amount", _pot)
 
 		Plays.BET:
 			GameManager.player_info[id]["action"] = Plays.BET
 			GameManager.player_info[id]["chips"] -= bet_amount
 			rpc("_set_player_action", _get_current_player_name(), "bet " + str(bet_amount))
-			rpc("_set_pot_amount", bet_amount)
+			_pot += bet_amount
+			rpc("_set_pot_amount", _pot)
 			_last_betting_player = id
 			_last_bet_amount = bet_amount
 
@@ -209,8 +215,9 @@ mastersync func _send_action(action: int, bet_amount: int):
 			)
 		)
 
-	if (_get_player_info(next_player_id).get("action_count") == 2
-		or _everyone_folded_or_checked()):
+	elif (_get_player_info(next_player_id).get("action_count") == 2
+		or _everyone_folded_or_checked()
+		or _last_betting_player == next_player_id):
 		_turn_over(next_player_id)
 
 	else:
@@ -229,9 +236,9 @@ func _turn_over(next_player_id : int):
 	else:
 		for player_id in GameManager.player_id_list:
 			GameManager.player_info.get(player_id)["action_count"] = 0
-			
+
 			if (GameManager.player_info.get(player_id)["action"] != Plays.FOLD
-				or GameManager.player_info.get(player_id)["action"] != Plays.ALL_IN):
+				and GameManager.player_info.get(player_id)["action"] != Plays.ALL_IN):
 				GameManager.player_info.get(player_id)["action"] = -1
 
 		rpc("_set_player_names", _get_player_names())
@@ -240,7 +247,6 @@ func _turn_over(next_player_id : int):
 
 func _everyone_folded_or_checked():
 	for id in GameManager.player_id_list:
-		print(_get_player_info(id).get("action"))
 		if not (
 			_get_player_info(id).get("action") in [Plays.FOLD, Plays.CHECK]
 			or _get_player_info(id).get("chips") <= 0
@@ -282,9 +288,8 @@ puppetsync func _set_turn(bet_amount: int) -> void:
 
 	_fold_button.disabled = false
 
-puppetsync func _set_pot_amount(amount: int) -> void:
-	_pot += amount
-	_pot_label.text = "Pot: " + str(amount)
+puppetsync func _set_pot_amount(new_pot: int) -> void:
+	_pot_label.text = "Pot: " + str(new_pot)
 
 puppetsync func _display_text(text: String) -> void:
 	_popup_text.display_text(text)
@@ -357,8 +362,8 @@ func _on_BetButton_pressed():
 		_last_puppet_bet_amount = int(bet_amount)
 		rpc("_send_action", Plays.BET, int(bet_amount))
 		_popup_text.display_text("Bet " + str(int(bet_amount)) + " chips")
-		_set_chip_count(_player_chip_count - int(bet_amount))
-		_player_chip_count = _player_chip_count - int(bet_amount)
+		_player_chip_count -= int(bet_amount)
+		_set_chip_count(_player_chip_count)
 
 
 func _on_AllInButton_pressed():
@@ -372,12 +377,12 @@ func _on_AllInButton_pressed():
 func _on_CallButton_pressed():
 	_disable_buttons()
 	_current_bet -= _last_puppet_bet_amount
-	print(_current_bet)
 	_last_puppet_bet_amount = 0
+	print(_player_chip_count)
 	_popup_text.display_text("Called")
 	rpc("_send_action", Plays.CALL, _current_bet)
-	_set_chip_count(_player_chip_count - _current_bet)
 	_player_chip_count -= _current_bet
+	_set_chip_count(_player_chip_count)
 
 
 # Universal Functions
