@@ -37,6 +37,7 @@ disabled = true
 text = "CHECK"
 
 [node name="NameList" parent="." instance=ExtResource( 4 )]
+margin_right = 240.0
 
 [node name="HTTPRequest" type="HTTPRequest" parent="."]
 
