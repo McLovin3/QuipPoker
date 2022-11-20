@@ -28,6 +28,7 @@ func reinitialise_game_manager() -> void:
 	for id in player_id_list:
 		player_info[id] = {"name": NetworkManager.players.get(id)}
 		player_info[id]["chips"] = INITIAL_POINT_AMOUNT
+		player_info[id]["action"] = 0
 
 	new_deck()
 

@@ -47,7 +47,7 @@ func _start_game():
 		]
 	)
 	rpc("_set_table_cards", _table_cards)
-	rpc("_set_player_names", GameManager.get_player_names())
+	rpc("_set_player_names", _get_player_names())
 	_initialise_players()
 	rpc_id(_players[0], "_set_turn", 0)
 
@@ -64,6 +64,22 @@ func _initialise_players() -> void:
 
 func _is_turn_over() -> bool:
 	return (_current_player + 1) == _players.size()
+
+
+func _get_player_names() -> Array:
+	var names: Array = []
+
+	for id in GameManager.player_id_list:
+		if GameManager.player_info.get(id).get("action") == Plays.FOLD:
+			names.append(GameManager.player_info.get(id).get("name") + " (folded)")
+		elif GameManager.player_info.get(id).get("action") == Plays.ALL_IN:
+			names.append(GameManager.player_info.get(id).get("name") + " (all in)")
+		elif GameManager.player_info.get(id).get("chips") <= 0:
+			names.append(GameManager.player_info.get(id).get("name") + " (busted)")
+		else:
+			names.append(GameManager.player_info.get(id).get("name"))
+
+	return names
 
 
 func _get_player_info(id: int) -> Dictionary:
@@ -162,7 +178,7 @@ func _turn_over():
 
 	else:
 		_current_player = 0
-		rpc("_set_player_names", GameManager.get_player_names())
+		rpc("_set_player_names", _get_player_names())
 		rpc("_set_currently_playing", _get_current_player_name())
 		rpc_id(_players[_current_player], "_set_turn", 0)
 
