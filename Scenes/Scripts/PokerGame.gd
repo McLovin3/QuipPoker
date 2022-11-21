@@ -58,7 +58,7 @@ func _start_game():
 	rpc("_set_table_cards", _table_cards)
 	rpc("_set_player_names", _get_player_names())
 	_initialise_players()
-	rpc_id(1, "_set_turn", 0)
+	rpc_id(1, "_set_turn", 0, 0)
 
 
 func _initialise_players() -> void:
@@ -231,7 +231,8 @@ mastersync func _send_action(action: int, bet_amount: int):
 
 	else:
 		rpc("_set_currently_playing", _get_current_player_name())
-		rpc_id(next_player_id, "_set_turn", _last_bet_amount)
+		rpc_id(next_player_id, "_set_turn", _last_bet_amount, 
+			GameManager.player_info.get(next_player_id).get("action_count"))
 
 func _turn_over() -> void: 
 	_turn += 1
@@ -256,7 +257,7 @@ func _turn_over() -> void:
 
 		rpc("_set_player_names", _get_player_names())
 		rpc("_set_currently_playing", _get_current_player_name())
-		rpc_id(_get_first_player_id(), "_set_turn", 0)
+		rpc_id(_get_first_player_id(), "_set_turn", 0, 0)
 
 func _everyone_folded_or_checked():
 	for id in GameManager.player_id_list:
@@ -283,16 +284,19 @@ puppetsync func _set_player_names(names: Array) -> void:
 	_name_list.set_player_names(names)
 
 var _current_bet: int = 0
-puppetsync func _set_turn(bet_amount: int) -> void:
+puppetsync func _set_turn(bet_amount: int, nb_action: int) -> void:
 	_current_bet = bet_amount
 	_popup_text.display_text("Your turn")
 	if _current_bet == 0:
 		_check_button.disabled = false
 		_bet_button.disabled = false
 		_bet_input.editable = true
-
+			
 	elif _current_bet > _player_chip_count:
 		_all_in_button.disabled = false
+		
+	elif _current_bet > 0 and nb_action == 1:
+		_call_button.disabled = false
 
 	elif _current_bet > 0:
 		_call_button.disabled = false
