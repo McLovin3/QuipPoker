@@ -127,6 +127,15 @@ func _is_one_player_left() -> bool:
 
 	return count == 1
 
+func _get_first_player_id() -> int:
+	for id in GameManager.player_id_list:
+		if not (
+			_get_player_info(id).get("action") in [Plays.FOLD, Plays.ALL_IN]
+			or _get_player_info(id).get("chips") <= 0
+		):
+			_current_player = GameManager.player_id_list.find(id)
+			return id
+	return -1
 
 func _get_next_player_id() -> int:
 	for id in GameManager.player_id_list.slice(
@@ -218,13 +227,17 @@ mastersync func _send_action(action: int, bet_amount: int):
 	elif (_get_player_info(next_player_id).get("action_count") == 2
 		or _everyone_folded_or_checked()
 		or _last_betting_player == next_player_id):
-		_turn_over(next_player_id)
+		_turn_over()
 
 	else:
+		rpc("_set_currently_playing", _get_current_player_name())
 		rpc_id(next_player_id, "_set_turn", _last_bet_amount)
 
-func _turn_over(next_player_id : int):
+func _turn_over() -> void: 
 	_turn += 1
+	_last_bet_amount = 0
+	_last_betting_player = 0
+	_last_puppet_bet_amount = 0
 	var new_card = GameManager.get_next_card()
 	_table_cards.append(new_card)
 	rpc("_flip_next_card", new_card)
@@ -243,7 +256,7 @@ func _turn_over(next_player_id : int):
 
 		rpc("_set_player_names", _get_player_names())
 		rpc("_set_currently_playing", _get_current_player_name())
-		rpc_id(next_player_id, "_set_turn", 0)
+		rpc_id(_get_first_player_id(), "_set_turn", 0)
 
 func _everyone_folded_or_checked():
 	for id in GameManager.player_id_list:
@@ -378,7 +391,6 @@ func _on_CallButton_pressed():
 	_disable_buttons()
 	_current_bet -= _last_puppet_bet_amount
 	_last_puppet_bet_amount = 0
-	print(_player_chip_count)
 	_popup_text.display_text("Called")
 	rpc("_send_action", Plays.CALL, _current_bet)
 	_player_chip_count -= _current_bet
