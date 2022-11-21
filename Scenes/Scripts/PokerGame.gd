@@ -223,7 +223,7 @@ mastersync func _send_action(action: int, bet_amount: int):
 				+ " chips!"
 			)
 		)
-
+	
 	elif (_get_player_info(next_player_id).get("action_count") == 2
 		or _everyone_folded_or_checked()
 		or _last_betting_player == next_player_id):

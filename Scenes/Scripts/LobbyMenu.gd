@@ -29,6 +29,8 @@ func _player_disconnected(username: String) -> void:
 	_name_list.remove_item(_names.find(username))
 	_names.remove(_names.find(username))
 
+	if _names.size() < 3:
+		_start_button.disabled = true
 
 func _player_connected(username: String, player_is_host: bool) -> void:
 	if player_is_host:
@@ -36,6 +38,9 @@ func _player_connected(username: String, player_is_host: bool) -> void:
 	else:
 		_name_list.add_item(username, null, false)
 	_names.append(username)
+
+	if _names.size() >= 3:
+		_start_button.disabled = false
 
 
 func _on_ExitButton_pressed() -> void:
@@ -52,4 +57,4 @@ puppetsync func _start_game() -> void:
 
 
 func _on_StartButton_pressed():
-		rpc("_start_game")
+	rpc("_start_game")

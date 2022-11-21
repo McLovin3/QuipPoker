@@ -34,6 +34,7 @@ margin_left = -100.0
 margin_top = 130.0
 margin_right = 100.0
 margin_bottom = 180.0
+disabled = true
 text = "Start"
 
 [node name="IpAddress" type="Label" parent="."]
