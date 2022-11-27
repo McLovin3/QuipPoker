@@ -2,6 +2,9 @@ extends CanvasLayer
 class_name PokerGame
 
 var ROUND_FEE_AMOUNT = 100
+var CHIPS = "chips"
+var NAME = "name"
+var ACTION = "action"
 
 onready var _raise_button: Button = $RaiseButton
 onready var _raise_input: ShakingInput = $RaiseInput
@@ -64,17 +67,17 @@ func _start_game():
 func _initialise_players() -> void:
 	for id in _players:
 		var player_cards = [GameManager.get_next_card(), GameManager.get_next_card()]
-		if GameManager.player_info.get(id)["chips"] >= ROUND_FEE_AMOUNT:
-			GameManager.player_info.get(id)["chips"] -= ROUND_FEE_AMOUNT
+		if GameManager.player_info.get(id)[CHIPS] >= ROUND_FEE_AMOUNT:
+			GameManager.player_info.get(id)[CHIPS] -= ROUND_FEE_AMOUNT
 			_pot += ROUND_FEE_AMOUNT
 			rpc("_set_pot_amount", _pot)
 		else:
-			_pot += GameManager.player_info.get(id)["chips"]
-			GameManager.player_info.get(id)["chips"] = 0
-			GameManager.player_info.get(id)["action"] = Plays.ALL_IN
+			_pot += GameManager.player_info.get(id)[CHIPS]
+			GameManager.player_info.get(id)[CHIPS] = 0
+			GameManager.player_info.get(id)[ACTION] = Plays.ALL_IN
 			rpc("_set_pot_amount", _pot)
 
-		rpc("_set_chip_count", GameManager.player_info.get(id)["chips"])
+		rpc("_set_chip_count", GameManager.player_info.get(id)[CHIPS])
 		GameManager.player_info[id]["cards"] = [
 			GameManager.get_api_value(player_cards[0]), GameManager.get_api_value(player_cards[1])
 		]
@@ -84,7 +87,7 @@ func _initialise_players() -> void:
 func _is_turn_over() -> bool:
 	var action_counts : Array = []
 	for id in GameManager.player_id_list:
-		if not (_get_player_info(id).get("action") in [Plays.FOLD, Plays.ALL_IN]):
+		if not (_get_player_info(id).get(ACTION) in [Plays.FOLD, Plays.ALL_IN]):
 			action_counts.append(_get_player_info(id)["action_count"])
 	
 	action_counts.sort()
@@ -95,14 +98,14 @@ func _get_player_names() -> Array:
 	var names: Array = []
 
 	for id in GameManager.player_id_list:
-		if GameManager.player_info.get(id).get("action") == Plays.FOLD:
-			names.append(GameManager.player_info.get(id).get("name") + " (folded)")
-		elif GameManager.player_info.get(id).get("action") == Plays.ALL_IN:
-			names.append(GameManager.player_info.get(id).get("name") + " (all in)")
-		elif GameManager.player_info.get(id).get("chips") <= 0:
-			names.append(GameManager.player_info.get(id).get("name") + " (busted)")
+		if GameManager.player_info.get(id).get(ACTION) == Plays.FOLD:
+			names.append(GameManager.player_info.get(id).get(NAME) + " (folded)")
+		elif GameManager.player_info.get(id).get(ACTION) == Plays.ALL_IN:
+			names.append(GameManager.player_info.get(id).get(NAME) + " (all in)")
+		elif GameManager.player_info.get(id).get(CHIPS) <= 0:
+			names.append(GameManager.player_info.get(id).get(NAME) + " (busted)")
 		else:
-			names.append(GameManager.player_info.get(id).get("name"))
+			names.append(GameManager.player_info.get(id).get(NAME))
 
 	return names
 
@@ -112,7 +115,7 @@ func _get_player_info(id: int) -> Dictionary:
 
 
 func _get_current_player_name() -> String:
-	return GameManager.player_info.get(_players[_current_player])["name"]
+	return GameManager.player_info.get(_players[_current_player])[NAME]
 
 
 func _is_one_player_left() -> bool:
@@ -120,8 +123,8 @@ func _is_one_player_left() -> bool:
 
 	for id in GameManager.player_id_list:
 		if not (
-			_get_player_info(id).get("action") in [Plays.FOLD, Plays.ALL_IN]
-			or _get_player_info(id).get("chips") <= 0
+			_get_player_info(id).get(ACTION) in [Plays.FOLD, Plays.ALL_IN]
+			or _get_player_info(id).get(CHIPS) <= 0
 		):
 			count += 1
 
@@ -130,8 +133,8 @@ func _is_one_player_left() -> bool:
 func _get_first_player_id() -> int:
 	for id in GameManager.player_id_list:
 		if not (
-			_get_player_info(id).get("action") in [Plays.FOLD, Plays.ALL_IN]
-			or _get_player_info(id).get("chips") <= 0
+			_get_player_info(id).get(ACTION) in [Plays.FOLD, Plays.ALL_IN]
+			or _get_player_info(id).get(CHIPS) <= 0
 		):
 			_current_player = GameManager.player_id_list.find(id)
 			return id
@@ -142,8 +145,8 @@ func _get_next_player_id() -> int:
 		_current_player + 1, GameManager.player_id_list.size()
 	):
 		if (
-			_get_player_info(id).get("action") in [Plays.FOLD, Plays.ALL_IN]
-			or _get_player_info(id).get("chips") <= 0
+			_get_player_info(id).get(ACTION) in [Plays.FOLD, Plays.ALL_IN]
+			or _get_player_info(id).get(CHIPS) <= 0
 		):
 			pass
 		else:
@@ -152,8 +155,8 @@ func _get_next_player_id() -> int:
 
 	for id in GameManager.player_id_list.slice(0, _current_player):
 		if (
-			_get_player_info(id).get("action") in [Plays.FOLD, Plays.ALL_IN]
-			or _get_player_info(id).get("chips") <= 0
+			_get_player_info(id).get(ACTION) in [Plays.FOLD, Plays.ALL_IN]
+			or _get_player_info(id).get(CHIPS) <= 0
 		):
 			pass
 		else:
@@ -169,15 +172,15 @@ mastersync func _send_action(action: int, bet_amount: int):
 
 	match action:
 		Plays.ALL_IN:
-			GameManager.player_info[id]["action"] = Plays.ALL_IN
-			GameManager.player_info[id]["chips"] = 0
+			GameManager.player_info[id][ACTION] = Plays.ALL_IN
+			GameManager.player_info[id][CHIPS] = 0
 			rpc("_set_player_action", _get_current_player_name(), "All In")
 			_pot += bet_amount
 			rpc("_set_pot_amount", _pot)
 
 		Plays.RAISE:
-			GameManager.player_info[id]["action"] = Plays.RAISE
-			GameManager.player_info[id]["chips"] -= bet_amount
+			GameManager.player_info[id][ACTION] = Plays.RAISE
+			GameManager.player_info[id][CHIPS] -= bet_amount
 			rpc("_set_player_action", _get_current_player_name(), "bet " + str(bet_amount))
 			_pot += bet_amount
 			rpc("_set_pot_amount", _pot)
@@ -185,15 +188,15 @@ mastersync func _send_action(action: int, bet_amount: int):
 			_last_bet_amount = bet_amount
 
 		Plays.CALL:
-			GameManager.player_info[id]["action"] = Plays.CALL
-			GameManager.player_info[id]["chips"] -= bet_amount
+			GameManager.player_info[id][ACTION] = Plays.CALL
+			GameManager.player_info[id][CHIPS] -= bet_amount
 			rpc("_set_player_action", _get_current_player_name(), "call")
 			_pot += bet_amount
 			rpc("_set_pot_amount", _pot)
 
 		Plays.BET:
-			GameManager.player_info[id]["action"] = Plays.BET
-			GameManager.player_info[id]["chips"] -= bet_amount
+			GameManager.player_info[id][ACTION] = Plays.BET
+			GameManager.player_info[id][CHIPS] -= bet_amount
 			rpc("_set_player_action", _get_current_player_name(), "bet " + str(bet_amount))
 			_pot += bet_amount
 			rpc("_set_pot_amount", _pot)
@@ -201,12 +204,12 @@ mastersync func _send_action(action: int, bet_amount: int):
 			_last_bet_amount = bet_amount
 
 		Plays.CHECK:
-			GameManager.player_info.get(id)["action"] = Plays.CHECK
+			GameManager.player_info.get(id)[ACTION] = Plays.CHECK
 			rpc("_set_player_action", _get_current_player_name(), "check")
 			_last_bet_amount = 0
 
 		Plays.FOLD:
-			GameManager.player_info.get(id)["action"] = Plays.FOLD
+			GameManager.player_info.get(id)[ACTION] = Plays.FOLD
 			rpc("_set_player_action", _get_current_player_name(), "fold")
 
 	var next_player_id = _get_next_player_id()
@@ -217,7 +220,7 @@ mastersync func _send_action(action: int, bet_amount: int):
 			"_display_text",
 			(
 				"Everyone else folded, "
-				+ _get_player_info(next_player_id).get("name")
+				+ _get_player_info(next_player_id).get(NAME)
 				+ " wins "
 				+ str(_pot)
 				+ " chips!"
@@ -251,9 +254,9 @@ func _turn_over() -> void:
 		for player_id in GameManager.player_id_list:
 			GameManager.player_info.get(player_id)["action_count"] = 0
 
-			if (GameManager.player_info.get(player_id)["action"] != Plays.FOLD
-				and GameManager.player_info.get(player_id)["action"] != Plays.ALL_IN):
-				GameManager.player_info.get(player_id)["action"] = -1
+			if (GameManager.player_info.get(player_id)[ACTION] != Plays.FOLD
+				and GameManager.player_info.get(player_id)[ACTION] != Plays.ALL_IN):
+				GameManager.player_info.get(player_id)[ACTION] = -1
 
 		rpc("_set_player_names", _get_player_names())
 		rpc("_set_currently_playing", _get_current_player_name())
@@ -262,8 +265,8 @@ func _turn_over() -> void:
 func _everyone_folded_or_checked():
 	for id in GameManager.player_id_list:
 		if not (
-			_get_player_info(id).get("action") in [Plays.FOLD, Plays.CHECK]
-			or _get_player_info(id).get("chips") <= 0
+			_get_player_info(id).get(ACTION) in [Plays.FOLD, Plays.CHECK]
+			or _get_player_info(id).get(CHIPS) <= 0
 		):
 			return false
 
@@ -330,6 +333,8 @@ puppetsync func _set_table_cards(table_values: Array) -> void:
 puppetsync func _set_player_cards(player_values: Array) -> void:
 	_card_manager.set_initial_player_cards(player_values)
 
+puppetsync func _change_scene_to_next_game() -> void:
+	get_tree().change_scene("res://scenes/QuiplashGame.tscn")
 
 func _on_FoldButton_pressed():
 	_disable_buttons()
@@ -408,7 +413,7 @@ func _get_player_api_hands() -> String:
 	var player_hands: String = ""
 
 	for player in _players:
-		if GameManager.player_info.get(player).get("action") != Plays.FOLD:
+		if GameManager.player_info.get(player).get(ACTION) != Plays.FOLD:
 			player_hands += "&pc[]="
 			for card in GameManager.player_info[player]["cards"]:
 				player_hands += card + ","
@@ -430,13 +435,47 @@ func _on_HTTPRequest_request_completed(
 	_result: int, _response_code: int, _headers: PoolStringArray, body: PoolByteArray
 ) -> void:
 	var result: Dictionary = JSON.parse(body.get_string_from_utf8()).result
-	print(result)
+	var winners: Array = result["winners"]
 
-	# var winners: Array = result["winners"]
-	# if winners.size() == 1:
-	# 	for id in _players:
-	# 		if (
-	# 			winners.split(",")[0] == GameManager.player_info[id]["hand"][player_id]["cards"][0]
-	# 			and winners.split(",")[1] == _players_information[player_id]["cards"][1]
-	# 		):
-	# 			rpc("_display_text")
+	if winners.size() == 1:
+		var winner: Dictionary = winners[0]
+
+		for id in _players:
+			if (
+				winner.get("cards").split(",")[0] == GameManager.player_info.get(id).get("cards")[0]
+				and winner.get("cards").split(",")[1] == GameManager.player_info.get(id).get("cards")[1]
+			):
+				rpc("_display_text", GameManager.player_info.get(id).get(NAME) + " won " + str(_pot) + " chips" \
+					+ " with " + winner.get("result"))
+				GameManager.last_winner_id = id
+				GameManager.player_info.get(id)[CHIPS] += _pot
+
+	else:
+		var winner_ids: Array = []
+
+		for winner in winners:
+			for id in _players:
+				if (
+					winner.get("cards").split(",")[0] == GameManager.player_info.get(id).get("cards")[0]
+					and winner.get("cards").split(",")[1] == GameManager.player_info.get(id).get("cards")[1]
+				):
+					winner_ids.append(id)
+					break
+
+		var winner_string = ""
+		for i in range(winner_ids.size()):
+			if i == winner_ids.size() - 1:
+				winner_string += " and " + GameManager.player_info.get(winner_ids[i]).get(NAME)
+			else:
+				winner_string += GameManager.player_info.get(winner_ids[i]).get(NAME) + ", "
+
+		rpc("_display_text", winner_string + " won " + str(_pot / winner_ids.size()) + " chips" \
+				+ " with " + winners[0].get("result"))
+
+		for id in winner_ids:
+			GameManager.player_info.get(id)[CHIPS] += _pot / winner_ids.size()
+		
+		GameManager.last_winner_id = winner_ids[randi()	% winner_ids.size()]
+	
+	yield(get_tree().create_timer(10), "timeout")
+	rpc("_change_scene_to_next_game") 
