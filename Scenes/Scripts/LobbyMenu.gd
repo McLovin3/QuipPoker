@@ -53,7 +53,7 @@ func _on_ExitButton_pressed() -> void:
 
 
 puppetsync func _start_game() -> void:
-	get_tree().change_scene("res://Scenes/PokerGame.tscn")
+	get_tree().change_scene("res://Scenes/QuiplashGame.tscn")
 
 
 func _on_StartButton_pressed():
