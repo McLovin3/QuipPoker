@@ -334,7 +334,7 @@ puppetsync func _set_player_cards(player_values: Array) -> void:
 	_card_manager.set_initial_player_cards(player_values)
 
 puppetsync func _change_scene_to_next_game() -> void:
-	get_tree().change_scene("res://scenes/QuiplashGame.tscn")
+	get_tree().change_scene("res://Scenes/QuiplashGame.tscn")
 
 func _on_FoldButton_pressed():
 	_disable_buttons()

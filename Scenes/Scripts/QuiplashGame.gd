@@ -1,4 +1,5 @@
 extends CanvasLayer
+const WIN_AMOUNT: int = 300
 
 var QUIPS: Array = [
 	"What is the REAL debate?",
@@ -19,8 +20,8 @@ var QUIPS: Array = [
 var _players: Array
 var _quip: String
 var _sent_answer: bool = false
-remote var _player_answers: Dictionary = {}
-remote var _player_info: Dictionary = {}
+mastersync var _player_answers: Dictionary = {}
+onready var _popup_text: PopupText = $PopupText
 onready var _quip_label: Label = $QuipLabel
 onready var _guesser_label: Label = $GuesserLabel
 onready var _input: ShakingInput = $Input
@@ -32,8 +33,6 @@ onready var _quip_list: ItemList = $QuipList
 func _ready():
 	if get_tree().is_network_server():
 		GameManager.reinitialise_game_manager()
-		_player_info = GameManager.player_info
-		rset("_player_info", GameManager.player_info)
 		_players = GameManager.player_id_list
 		randomize()
 		_quip = QUIPS[randi() % QUIPS.size()]
@@ -42,7 +41,7 @@ func _ready():
 				rpc_id(id, "_set_as_judge", _quip)
 			else:
 				rpc_id(
-					id, "_set_quip", _quip, _player_info.get(GameManager.last_winner_id).get("name")
+					id, "_set_quip", _quip, GameManager.player_info.get(GameManager.last_winner_id).get("name")
 				)
 
 
@@ -50,17 +49,24 @@ func _ready():
 mastersync func send_player_answer(answer: String) -> void:
 	var id = get_tree().get_rpc_sender_id()
 
-	_player_answers[id] = answer
+	_player_answers[id] = {}
+	_player_answers[id]["answer"] = answer
+	_player_answers[id]["name"] = GameManager.player_info.get(id).get("name")
 
 	if _player_answers.keys().size() == _players.size() - 1:
-		rset("_player_answers", _player_answers)
-		rpc_id(GameManager.last_winner_id, "_set_judge_time")
+		rpc_id(GameManager.last_winner_id, "_set_judge_time", _player_answers)
 
 		for player_id in _player_answers.keys():
-			rpc_id(player_id, "_set_turn_over")
+			rpc_id(player_id, "_set_turn_over", _player_answers)
 
-mastersync func _set_winner(id: int) -> void:
-	print("Winner is: " + _player_info.get(id).get("name"))
+mastersync func _set_winner(id : int) -> void:
+	if GameManager.player_info.get(id).get("chips") > 0:
+		GameManager.player_info.get(id)["chips"] += WIN_AMOUNT
+
+	rpc("_show_end_message", _player_answers.get(id).get("answer") + " - " \
+		+ _player_answers.get(id).get("name"))
+
+	
 
 # Puppet functions
 puppetsync func _set_quip(quip: String, judge: String) -> void:
@@ -74,25 +80,29 @@ puppetsync func _set_as_judge(quip: String) -> void:
 	_input.visible = false
 	_confirm_button.visible = false
 
-puppetsync func _show_message(message: String) -> void:
-	pass
+puppetsync func _show_end_message(message: String) -> void:
+	_popup_text.display_text(message)
 
-puppetsync func _set_judge_time() -> void:
+	yield(get_tree().create_timer(10), "timeout")
+	get_tree().change_scene("res://Scenes/PokerGame.tscn")
+
+puppetsync func _set_judge_time(player_answers: Dictionary) -> void:
 	_quip_list.visible = true
+	_player_answers = player_answers
 
-	for answer in _player_answers.keys():
+	for id in player_answers.keys():
 		_quip_list.add_item(
-			_player_answers.get(answer) + " - " + _player_info.get(answer).get("name"), null, true
+			player_answers.get(id).get("answer") + " - " + player_answers.get(id).get("name"), null, true
 		)
 
-puppetsync func _set_turn_over() -> void:
+puppetsync func _set_turn_over(player_answers: Dictionary) -> void:
 	_input.visible = false
 	_confirm_button.visible = false
 	_quip_list.visible = true
 
-	for answer in _player_answers.keys():
+	for id in player_answers.keys():
 		_quip_list.add_item(
-			_player_answers.get(answer) + " - " + _player_info.get(answer).get("name"), null, false
+			player_answers.get(id).get("answer") + " - " + player_answers.get(id).get("name"), null, false
 		)
 
 
@@ -114,5 +124,7 @@ func _on_ConfirmButton_pressed() -> void:
 
 
 func _on_QuipList_item_selected(index:int):
-	var winner_id = _player_answers.keys()[_quip_list.items[index]]
+	var winner_id = _player_answers.keys()[index]
+	print("Winner id: " + _player_answers.get(winner_id).get("name"))
 	rpc("_set_winner", winner_id)
+
