@@ -8,7 +8,6 @@ enum Values { ACE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, Q
 var _deck: Array = []
 var player_id_list: Array = []
 var player_info: Dictionary = {}
-#TODO change this
 var last_winner_id: int = 1
 
 

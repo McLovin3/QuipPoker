@@ -19,9 +19,8 @@ onready var _card_manager: CardManager = $CardManager
 onready var _popup_text: PopupText = $PopupText
 onready var _http_request: HTTPRequest = $HTTPRequest
 onready var _check_button: Button = $CheckButton
-onready var _fold_button: Button = $FoldButton
+onready var _turn_timer: Timer = $TurnTimer
 
-# TODO Change order clockwise after every poker game
 # TODO No duplicate names
 # TODO Max 8 players
 # TODO turn timer
@@ -227,6 +226,7 @@ mastersync func _send_action(action: int, bet_amount: int):
 		GameManager.last_winner_id = next_player_id
 		GameManager.player_info.get(next_player_id)[CHIPS] += _pot
 		yield(get_tree().create_timer(10), "timeout")
+		GameManager.change_player_order_clockwise()
 		rpc("_change_scene_to_next_game") 
 
 	
@@ -482,4 +482,5 @@ func _on_HTTPRequest_request_completed(
 		GameManager.last_winner_id = winner_ids[randi()	% winner_ids.size()]
 	
 	yield(get_tree().create_timer(10), "timeout")
+	GameManager.change_player_order_clockwise()
 	rpc("_change_scene_to_next_game") 
