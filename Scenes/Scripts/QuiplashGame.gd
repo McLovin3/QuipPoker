@@ -32,7 +32,6 @@ onready var _quip_list: ItemList = $QuipList
 
 func _ready():
 	if get_tree().is_network_server():
-		GameManager.reinitialise_game_manager()
 		_players = GameManager.player_id_list
 		randomize()
 		_quip = QUIPS[randi() % QUIPS.size()]
@@ -81,7 +80,10 @@ puppetsync func _set_as_judge(quip: String) -> void:
 	_confirm_button.visible = false
 
 puppetsync func _show_end_message(message: String) -> void:
+	_popup_text.set_ttl(12)
 	_popup_text.display_text(message)
+
+	_quip_list.visible = false
 
 	yield(get_tree().create_timer(10), "timeout")
 	get_tree().change_scene("res://Scenes/PokerGame.tscn")
@@ -120,11 +122,10 @@ func _on_ConfirmButton_pressed() -> void:
 	_sent_answer = true
 	_input.visible = false
 	_confirm_button.visible = false
-	rpc("send_player_answer", _input.text)
+	rpc_id(1, "send_player_answer", _input.text)
 
 
 func _on_QuipList_item_selected(index:int):
 	var winner_id = _player_answers.keys()[index]
-	print("Winner id: " + _player_answers.get(winner_id).get("name"))
-	rpc("_set_winner", winner_id)
+	rpc_id(1, "_set_winner", winner_id)
 

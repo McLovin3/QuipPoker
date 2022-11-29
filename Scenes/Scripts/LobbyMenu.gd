@@ -32,6 +32,7 @@ func _player_disconnected(username: String) -> void:
 	if _names.size() < 3:
 		_start_button.disabled = true
 
+
 func _player_connected(username: String, player_is_host: bool) -> void:
 	if player_is_host:
 		_name_list.add_item(username + " (Host)", null, false)
@@ -53,7 +54,8 @@ func _on_ExitButton_pressed() -> void:
 
 
 puppetsync func _start_game() -> void:
-	get_tree().change_scene("res://Scenes/QuiplashGame.tscn")
+	GameManager.reinitialise_game_manager()
+	get_tree().change_scene("res://Scenes/PokerGame.tscn")
 
 
 func _on_StartButton_pressed():

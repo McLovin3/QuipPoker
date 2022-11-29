@@ -7,6 +7,10 @@ onready var _tween = $Tween
 onready var _timer = $Timer
 
 
+func set_ttl(time: int) -> void:
+	_timer.wait_time = time
+
+
 func display_text(text: String):
 	self.text = text
 	_tween.interpolate_property(self, "percent_visible", 0, 1, TWEEN_DURATION)

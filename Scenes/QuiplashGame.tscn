@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Scenes/Scripts/QuiplashGame.gd" type="Script" id=1]
 [ext_resource path="res://Scenes/NeonButton.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Scenes/ShakingInput.tscn" type="PackedScene" id=3]
 [ext_resource path="res://xolonium/xolonium-fonts-4.1/ttf/Xolonium-Bold.ttf" type="DynamicFontData" id=4]
 [ext_resource path="res://Themes/ItemList.tres" type="Theme" id=5]
+[ext_resource path="res://Scenes/PopupText.tscn" type="PackedScene" id=6]
 
 [sub_resource type="DynamicFont" id=1]
 size = 32
@@ -29,12 +30,13 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 margin_left = -400.0
-margin_top = -170.0
+margin_top = -240.0
 margin_right = 400.0
-margin_bottom = -110.0
+margin_bottom = -75.0
 custom_fonts/font = SubResource( 1 )
 align = 1
 valign = 1
+autowrap = true
 uppercase = true
 
 [node name="GuesserLabel" type="Label" parent="."]
@@ -75,6 +77,8 @@ margin_top = -60.0
 margin_right = 240.0
 margin_bottom = 200.0
 theme = ExtResource( 5 )
+
+[node name="PopupText" parent="." instance=ExtResource( 6 )]
 
 [connection signal="pressed" from="ConfirmButton" to="." method="_on_ConfirmButton_pressed"]
 [connection signal="timeout" from="TurnTimer" to="." method="_on_TurnTimer_timeout"]

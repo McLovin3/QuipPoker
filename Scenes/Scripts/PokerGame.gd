@@ -22,10 +22,8 @@ onready var _check_button: Button = $CheckButton
 onready var _fold_button: Button = $FoldButton
 
 # TODO Change order clockwise after every poker game
-# TODO Game closing returns to main menu
 # TODO No duplicate names
 # TODO Max 8 players
-# TODO Min 3 players
 # TODO turn timer
 
 enum Plays { CHECK, FOLD, RAISE, BET, CALL, ALL_IN }
@@ -50,7 +48,6 @@ func _ready():
 
 
 func _start_game():
-	GameManager.reinitialise_game_manager()
 	_players = GameManager.player_id_list
 	_table_cards.append_array(
 		[
@@ -67,17 +64,17 @@ func _start_game():
 func _initialise_players() -> void:
 	for id in _players:
 		var player_cards = [GameManager.get_next_card(), GameManager.get_next_card()]
-		if GameManager.player_info.get(id)[CHIPS] >= ROUND_FEE_AMOUNT:
+		if GameManager.player_info.get(id)[CHIPS] > ROUND_FEE_AMOUNT:
 			GameManager.player_info.get(id)[CHIPS] -= ROUND_FEE_AMOUNT
+			print(GameManager.player_info)
 			_pot += ROUND_FEE_AMOUNT
-			rpc("_set_pot_amount", _pot)
 		else:
 			_pot += GameManager.player_info.get(id)[CHIPS]
 			GameManager.player_info.get(id)[CHIPS] = 0
 			GameManager.player_info.get(id)[ACTION] = Plays.ALL_IN
-			rpc("_set_pot_amount", _pot)
-
-		rpc("_set_chip_count", GameManager.player_info.get(id)[CHIPS])
+			
+		rpc("_set_pot_amount", _pot)
+		rpc_id(id, "_set_chip_count", GameManager.player_info.get(id)[CHIPS])
 		GameManager.player_info[id]["cards"] = [
 			GameManager.get_api_value(player_cards[0]), GameManager.get_api_value(player_cards[1])
 		]
@@ -226,6 +223,12 @@ mastersync func _send_action(action: int, bet_amount: int):
 				+ " chips!"
 			)
 		)
+		_popup_text.set_ttl(12)
+		GameManager.last_winner_id = next_player_id
+		GameManager.player_info.get(next_player_id)[CHIPS] += _pot
+		yield(get_tree().create_timer(10), "timeout")
+		rpc("_change_scene_to_next_game") 
+
 	
 	elif (_get_player_info(next_player_id).get("action_count") == 2
 		or _everyone_folded_or_checked()
@@ -430,12 +433,13 @@ func _determine_winner():
 		)
 	)
 
-
 func _on_HTTPRequest_request_completed(
 	_result: int, _response_code: int, _headers: PoolStringArray, body: PoolByteArray
 ) -> void:
 	var result: Dictionary = JSON.parse(body.get_string_from_utf8()).result
 	var winners: Array = result["winners"]
+
+	_popup_text.set_ttl(12)
 
 	if winners.size() == 1:
 		var winner: Dictionary = winners[0]

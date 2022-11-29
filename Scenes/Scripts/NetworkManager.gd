@@ -53,7 +53,7 @@ func close_server() -> void:
 	if _peer:
 		_peer.close_connection()
 		get_tree().set_network_peer(null)
-	
+
 	players.clear()
 
 
@@ -64,9 +64,11 @@ remote func _register_player(username: String) -> void:
 
 # Client functions
 
+
 func _lobby_closed() -> void:
-	get_tree().change_scene("res://Scenes/LobbyMenu.tscn")
+	get_tree().change_scene("res://Scenes/MainMenu.tscn")
 	NetworkManager.close_client()
+
 
 func join_server(ip_address: String) -> void:
 	_peer = NetworkedMultiplayerENet.new()
@@ -94,6 +96,7 @@ func get_ip_address() -> String:
 
 func set_username(username: String) -> void:
 	_username = username
+
 
 func get_username() -> String:
 	return _username
