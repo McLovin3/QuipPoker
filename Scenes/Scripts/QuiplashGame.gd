@@ -19,13 +19,11 @@ var QUIPS: Array = [
 ]
 var _players: Array
 var _quip: String
-var _sent_answer: bool = false
 mastersync var _player_answers: Dictionary = {}
 onready var _popup_text: PopupText = $PopupText
 onready var _quip_label: Label = $QuipLabel
 onready var _guesser_label: Label = $GuesserLabel
 onready var _input: ShakingInput = $Input
-onready var _turn_timer: Timer = $TurnTimer
 onready var _confirm_button: Button = $ConfirmButton
 onready var _quip_list: ItemList = $QuipList
 
@@ -71,7 +69,6 @@ mastersync func _set_winner(id : int) -> void:
 puppetsync func _set_quip(quip: String, judge: String) -> void:
 	_quip_label.text = quip
 	_guesser_label.text = judge + " will be judging!"
-	_turn_timer.start()
 
 puppetsync func _set_as_judge(quip: String) -> void:
 	_quip_label.text = quip
@@ -107,19 +104,11 @@ puppetsync func _set_turn_over(player_answers: Dictionary) -> void:
 			player_answers.get(id).get("answer") + " - " + player_answers.get(id).get("name"), null, false
 		)
 
-
-func _on_TurnTimer_timeout() -> void:
-	if not _sent_answer:
-		rpc("send_player_answer", "No answer")
-		_sent_answer = true
-
-
 func _on_ConfirmButton_pressed() -> void:
 	if _input.text == "":
 		_input.shake()
 		return
 
-	_sent_answer = true
 	_input.visible = false
 	_confirm_button.visible = false
 	rpc_id(1, "send_player_answer", _input.text)

@@ -19,11 +19,10 @@ onready var _card_manager: CardManager = $CardManager
 onready var _popup_text: PopupText = $PopupText
 onready var _http_request: HTTPRequest = $HTTPRequest
 onready var _check_button: Button = $CheckButton
-onready var _turn_timer: Timer = $TurnTimer
+onready var _fold_button: Button = $FoldButton
 
 # TODO No duplicate names
 # TODO Max 8 players
-# TODO turn timer
 
 enum Plays { CHECK, FOLD, RAISE, BET, CALL, ALL_IN }
 
@@ -62,10 +61,10 @@ func _start_game():
 
 func _initialise_players() -> void:
 	for id in _players:
+		GameManager.player_info.get(id)["action_count"] = 0
 		var player_cards = [GameManager.get_next_card(), GameManager.get_next_card()]
 		if GameManager.player_info.get(id)[CHIPS] > ROUND_FEE_AMOUNT:
 			GameManager.player_info.get(id)[CHIPS] -= ROUND_FEE_AMOUNT
-			print(GameManager.player_info)
 			_pot += ROUND_FEE_AMOUNT
 		else:
 			_pot += GameManager.player_info.get(id)[CHIPS]
@@ -119,8 +118,8 @@ func _is_one_player_left() -> bool:
 
 	for id in GameManager.player_id_list:
 		if not (
-			_get_player_info(id).get(ACTION) in [Plays.FOLD, Plays.ALL_IN]
-			or _get_player_info(id).get(CHIPS) <= 0
+			_get_player_info(id).get(ACTION) in [Plays.FOLD]
+			or _get_player_info(id).get(CHIPS) <= 0 and _get_player_info(id).get(ACTION) != Plays.ALL_IN
 		):
 			count += 1
 
@@ -172,6 +171,7 @@ mastersync func _send_action(action: int, bet_amount: int):
 			GameManager.player_info[id][CHIPS] = 0
 			rpc("_set_player_action", _get_current_player_name(), "All In")
 			_pot += bet_amount
+			_last_bet_amount = bet_amount
 			rpc("_set_pot_amount", _pot)
 
 		Plays.RAISE:
@@ -209,8 +209,20 @@ mastersync func _send_action(action: int, bet_amount: int):
 			rpc("_set_player_action", _get_current_player_name(), "fold")
 
 	var next_player_id = _get_next_player_id()
+	
 
-	if _is_one_player_left(): 
+	if _is_everyone_all_in():
+		rpc("_disable_buttons")
+		while _turn < 4:
+			_turn += 1
+			var new_card = GameManager.get_next_card()
+			_table_cards.append(new_card)
+			rpc("_flip_next_card", new_card)
+		
+		_determine_winner()
+
+
+	elif _is_one_player_left(): 
 		rpc("_disable_buttons")
 		rpc(
 			"_display_text",
@@ -275,6 +287,13 @@ func _everyone_folded_or_checked():
 
 	return true
 
+func _is_everyone_all_in() -> bool:
+	for id in GameManager.player_id_list:
+		if _get_player_info(id).get(ACTION) != Plays.ALL_IN:
+			return false
+
+	return true
+
 # Player Functions
 puppetsync func _set_chip_count(amount: int) -> void:
 	_player_chip_count = amount
@@ -296,9 +315,10 @@ puppetsync func _set_turn(bet_amount: int, nb_action: int) -> void:
 	if _current_bet == 0:
 		_check_button.disabled = false
 		_bet_button.disabled = false
+		_all_in_button.disabled = false
 		_bet_input.editable = true
 			
-	elif _current_bet > _player_chip_count:
+	elif _current_bet >= _player_chip_count:
 		_all_in_button.disabled = false
 		
 	elif _current_bet > 0 and nb_action == 1:
@@ -337,7 +357,7 @@ puppetsync func _set_player_cards(player_values: Array) -> void:
 	_card_manager.set_initial_player_cards(player_values)
 
 puppetsync func _change_scene_to_next_game() -> void:
-	get_tree().change_scene("res://Scenes/QuiplashGame.tscn")
+	get_tree().change_scene("res://Scenes/PokerGame.tscn")
 
 func _on_FoldButton_pressed():
 	_disable_buttons()
@@ -359,11 +379,11 @@ func _on_RaiseButton_pressed():
 		or int(_raise_input.text) + _current_bet > _player_chip_count
 		or int(_raise_input.text) + _current_bet <= _current_bet
 	):
-		_bet_input.shake()
+		_raise_input.shake()
 
 	else:
 		bet_amount = int(bet_amount) + _current_bet
-
+		_raise_input.text = ""
 		_disable_buttons()
 		rpc("_send_action", Plays.RAISE, bet_amount)
 		_popup_text.display_text("Raised to " + str(bet_amount) + " chips")
@@ -377,12 +397,13 @@ func _on_BetButton_pressed():
 
 	if (
 		!_bet_input.text.is_valid_integer()
-		or int(_bet_input.text) > _player_chip_count
+		or int(_bet_input.text) >= _player_chip_count
 		or int(_bet_input.text) <= 0
 	):
 		_bet_input.shake()
 
 	else:
+		_bet_input.text = ""
 		_disable_buttons()
 		_last_puppet_bet_amount = int(bet_amount)
 		rpc("_send_action", Plays.BET, int(bet_amount))
@@ -481,6 +502,25 @@ func _on_HTTPRequest_request_completed(
 		
 		GameManager.last_winner_id = winner_ids[randi()	% winner_ids.size()]
 	
-	yield(get_tree().create_timer(10), "timeout")
-	GameManager.change_player_order_clockwise()
-	rpc("_change_scene_to_next_game") 
+		yield(get_tree().create_timer(10), "timeout")
+	
+	if _has_winner():
+		rpc("_display_text", GameManager.player_info.get(GameManager.last_winner_id).get(NAME) + " won!")
+		yield(get_tree().create_timer(10), "timeout")
+		NetworkManager.close_server()
+
+	else:
+		GameManager.change_player_order_clockwise()
+		rpc("_change_scene_to_next_game") 
+
+func _has_winner() -> bool:
+	var players_left = 0
+
+	for id in _players:
+		if GameManager.player_info.get(id).get(CHIPS) != 0:
+			players_left += 1
+	
+	return players_left == 1
+
+func _on_TurnTimer_timeout():
+	rpc("_send_action", Plays.FOLD, 0)
