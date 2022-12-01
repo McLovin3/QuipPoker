@@ -9,7 +9,7 @@ export var max_clients: int = 6
 onready var _connection_timer: Timer = $ConnectionTimer
 
 var _peer: NetworkedMultiplayerENet
-var _username: String = "Joe Biden" setget set_username, get_username
+var _username: String = "" setget set_username, get_username
 var _ip_address: String = "" setget , get_ip_address
 var players: Dictionary = {}
 
@@ -41,12 +41,22 @@ func create_server() -> void:
 
 
 func _player_connected(id: int) -> void:
+	if players.keys().size() <= 5:
+		get_tree().network_peer.disconnect_peer(id)
+		return
+
+	for id in players:
+		if _username == players[id]:
+			get_tree().network_peer.disconnect_peer(id)
+			return
+			
 	rpc_id(id, "_register_player", _username)
 
 
 func _player_disconnected(id: int) -> void:
-	emit_signal("player_left", players[id])
-	players.erase(id)
+	if players.has(id):
+		emit_signal("player_left", players[id])
+		players.erase(id)
 
 
 func close_server() -> void:

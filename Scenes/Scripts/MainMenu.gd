@@ -12,8 +12,8 @@ func _on_HostButton_pressed() -> void:
 	if _username_input.text == "":
 		_username_input.shake()
 	else:
-		NetworkManager.create_server()
 		NetworkManager.set_username(_username_input.text)
+		NetworkManager.create_server()
 		get_tree().change_scene("res://Scenes/LobbyMenu.tscn")
 
 
