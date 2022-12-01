@@ -6,6 +6,7 @@ onready var _join_button: Button = $JoinButton
 
 
 func _ready():
+	_ip_input.text = "192.168.0.112"
 	get_tree().connect("connection_failed", self, "_connection_failed")
 
 

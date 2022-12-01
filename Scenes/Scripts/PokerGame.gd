@@ -24,7 +24,7 @@ onready var _fold_button: Button = $FoldButton
 # TODO No duplicate names
 # TODO Max 8 players
 
-enum Plays { CHECK, FOLD, RAISE, BET, CALL, ALL_IN }
+enum Plays { CHECK, FOLD, RAISE, BET, CALL, ALL_IN, BUSTED }
 
 var _last_puppet_bet_amount: int = 0
 var _last_bet_amount: int = 0
@@ -44,7 +44,6 @@ func _ready():
 
 # Host Functions
 
-
 func _start_game():
 	_players = GameManager.player_id_list
 	_table_cards.append_array(
@@ -53,10 +52,11 @@ func _start_game():
 			GameManager.get_next_card(),
 		]
 	)
+	_initialise_players()
+	var next_player_id = _get_first_player_id()
 	rpc("_set_table_cards", _table_cards)
 	rpc("_set_player_names", _get_player_names())
-	_initialise_players()
-	rpc_id(1, "_set_turn", 0, 0)
+	rpc_id(next_player_id, "_set_turn", 0, 0)
 
 
 func _initialise_players() -> void:
@@ -64,12 +64,15 @@ func _initialise_players() -> void:
 		GameManager.player_info.get(id)["action_count"] = 0
 		var player_cards = [GameManager.get_next_card(), GameManager.get_next_card()]
 		if GameManager.player_info.get(id)[CHIPS] > ROUND_FEE_AMOUNT:
+			GameManager.player_info.get(id)[ACTION] = -1
 			GameManager.player_info.get(id)[CHIPS] -= ROUND_FEE_AMOUNT
 			_pot += ROUND_FEE_AMOUNT
-		else:
+		elif GameManager.player_info.get(id)[CHIPS] > 0:
 			_pot += GameManager.player_info.get(id)[CHIPS]
 			GameManager.player_info.get(id)[CHIPS] = 0
 			GameManager.player_info.get(id)[ACTION] = Plays.ALL_IN
+		else:
+			GameManager.player_info.get(id)[ACTION] = Plays.BUSTED
 			
 		rpc("_set_pot_amount", _pot)
 		rpc_id(id, "_set_chip_count", GameManager.player_info.get(id)[CHIPS])
@@ -97,7 +100,7 @@ func _get_player_names() -> Array:
 			names.append(GameManager.player_info.get(id).get(NAME) + " (folded)")
 		elif GameManager.player_info.get(id).get(ACTION) == Plays.ALL_IN:
 			names.append(GameManager.player_info.get(id).get(NAME) + " (all in)")
-		elif GameManager.player_info.get(id).get(CHIPS) <= 0:
+		elif GameManager.player_info.get(id).get(ACTION) == Plays.BUSTED:
 			names.append(GameManager.player_info.get(id).get(NAME) + " (busted)")
 		else:
 			names.append(GameManager.player_info.get(id).get(NAME))
@@ -117,20 +120,14 @@ func _is_one_player_left() -> bool:
 	var count: int = 0
 
 	for id in GameManager.player_id_list:
-		if not (
-			_get_player_info(id).get(ACTION) in [Plays.FOLD]
-			or _get_player_info(id).get(CHIPS) <= 0 and _get_player_info(id).get(ACTION) != Plays.ALL_IN
-		):
+		if not _get_player_info(id).get(ACTION) in [Plays.FOLD, Plays.ALL_IN, Plays.BUSTED]:
 			count += 1
 
 	return count == 1
 
 func _get_first_player_id() -> int:
 	for id in GameManager.player_id_list:
-		if not (
-			_get_player_info(id).get(ACTION) in [Plays.FOLD, Plays.ALL_IN]
-			or _get_player_info(id).get(CHIPS) <= 0
-		):
+		if not _get_player_info(id).get(ACTION) in [Plays.FOLD, Plays.ALL_IN, Plays.BUSTED]:
 			_current_player = GameManager.player_id_list.find(id)
 			return id
 	return -1
@@ -139,22 +136,12 @@ func _get_next_player_id() -> int:
 	for id in GameManager.player_id_list.slice(
 		_current_player + 1, GameManager.player_id_list.size()
 	):
-		if (
-			_get_player_info(id).get(ACTION) in [Plays.FOLD, Plays.ALL_IN]
-			or _get_player_info(id).get(CHIPS) <= 0
-		):
-			pass
-		else:
+		if not _get_player_info(id).get(ACTION) in [Plays.FOLD, Plays.ALL_IN, Plays.BUSTED]:
 			_current_player = GameManager.player_id_list.find(id)
 			return _players[_current_player]
 
 	for id in GameManager.player_id_list.slice(0, _current_player):
-		if (
-			_get_player_info(id).get(ACTION) in [Plays.FOLD, Plays.ALL_IN]
-			or _get_player_info(id).get(CHIPS) <= 0
-		):
-			pass
-		else:
+		if not _get_player_info(id).get(ACTION) in [Plays.FOLD, Plays.ALL_IN, Plays.BUSTED]:
 			_current_player = GameManager.player_id_list.find(id)
 			return _players[_current_player]
 
@@ -209,7 +196,9 @@ mastersync func _send_action(action: int, bet_amount: int):
 			rpc("_set_player_action", _get_current_player_name(), "fold")
 
 	var next_player_id = _get_next_player_id()
-	
+
+	print(GameManager.player_info)
+	print(_get_player_info(next_player_id))
 
 	if _is_everyone_all_in():
 		rpc("_disable_buttons")
@@ -238,17 +227,15 @@ mastersync func _send_action(action: int, bet_amount: int):
 		GameManager.last_winner_id = next_player_id
 		GameManager.player_info.get(next_player_id)[CHIPS] += _pot
 		yield(get_tree().create_timer(10), "timeout")
-		GameManager.change_player_order_clockwise()
 		rpc("_change_scene_to_next_game") 
 
-	
 	elif (_get_player_info(next_player_id).get("action_count") == 2
 		or _everyone_folded_or_checked()
 		or _last_betting_player == next_player_id):
 		_turn_over()
 
 	else:
-		rpc("_set_currently_playing", _get_current_player_name())
+		rpc("_set_currently_playing", GameManager.player_info.get(next_player_id).get(NAME))
 		rpc_id(next_player_id, "_set_turn", _last_bet_amount, 
 			GameManager.player_info.get(next_player_id).get("action_count"))
 
@@ -269,8 +256,7 @@ func _turn_over() -> void:
 		for player_id in GameManager.player_id_list:
 			GameManager.player_info.get(player_id)["action_count"] = 0
 
-			if (GameManager.player_info.get(player_id)[ACTION] != Plays.FOLD
-				and GameManager.player_info.get(player_id)[ACTION] != Plays.ALL_IN):
+			if not GameManager.player_info.get(player_id)[ACTION] in [Plays.FOLD, Plays.ALL_IN, Plays.BUSTED]:
 				GameManager.player_info.get(player_id)[ACTION] = -1
 
 		rpc("_set_player_names", _get_player_names())
@@ -279,17 +265,14 @@ func _turn_over() -> void:
 
 func _everyone_folded_or_checked():
 	for id in GameManager.player_id_list:
-		if not (
-			_get_player_info(id).get(ACTION) in [Plays.FOLD, Plays.CHECK]
-			or _get_player_info(id).get(CHIPS) <= 0
-		):
+		if not _get_player_info(id).get(ACTION) in [Plays.FOLD, Plays.CHECK, Plays.BUSTED]:
 			return false
 
 	return true
 
 func _is_everyone_all_in() -> bool:
 	for id in GameManager.player_id_list:
-		if _get_player_info(id).get(ACTION) != Plays.ALL_IN:
+		if not _get_player_info(id).get(ACTION) in [Plays.FOLD, Plays.BUSTED, Plays.ALL_IN]:
 			return false
 
 	return true
@@ -437,7 +420,7 @@ func _get_player_api_hands() -> String:
 	var player_hands: String = ""
 
 	for player in _players:
-		if GameManager.player_info.get(player).get(ACTION) != Plays.FOLD:
+		if not GameManager.player_info.get(player).get(ACTION) in [Plays.FOLD, Plays.BUSTED]:
 			player_hands += "&pc[]="
 			for card in GameManager.player_info[player]["cards"]:
 				player_hands += card + ","
@@ -502,7 +485,7 @@ func _on_HTTPRequest_request_completed(
 		
 		GameManager.last_winner_id = winner_ids[randi()	% winner_ids.size()]
 	
-		yield(get_tree().create_timer(10), "timeout")
+	yield(get_tree().create_timer(10), "timeout")
 	
 	if _has_winner():
 		rpc("_display_text", GameManager.player_info.get(GameManager.last_winner_id).get(NAME) + " won!")
@@ -510,7 +493,6 @@ func _on_HTTPRequest_request_completed(
 		NetworkManager.close_server()
 
 	else:
-		GameManager.change_player_order_clockwise()
 		rpc("_change_scene_to_next_game") 
 
 func _has_winner() -> bool:
