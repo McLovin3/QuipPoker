@@ -67,11 +67,8 @@ func _initialise_players() -> void:
 			GameManager.player_info.get(id)[ACTION] = -1
 			GameManager.player_info.get(id)[CHIPS] -= ROUND_FEE_AMOUNT
 			_pot += ROUND_FEE_AMOUNT
-		elif GameManager.player_info.get(id)[CHIPS] > 0:
-			_pot += GameManager.player_info.get(id)[CHIPS]
-			GameManager.player_info.get(id)[CHIPS] = 0
-			GameManager.player_info.get(id)[ACTION] = Plays.ALL_IN
 		else:
+			GameManager.player_info.get(id)[CHIPS] = 0
 			GameManager.player_info.get(id)[ACTION] = Plays.BUSTED
 			
 		rpc("_set_pot_amount", _pot)
@@ -159,6 +156,7 @@ mastersync func _send_action(action: int, bet_amount: int):
 			rpc("_set_player_action", _get_current_player_name(), "All In")
 			_pot += bet_amount
 			_last_bet_amount = bet_amount
+			_last_betting_player = id
 			rpc("_set_pot_amount", _pot)
 
 		Plays.RAISE:
@@ -196,9 +194,6 @@ mastersync func _send_action(action: int, bet_amount: int):
 			rpc("_set_player_action", _get_current_player_name(), "fold")
 
 	var next_player_id = _get_next_player_id()
-
-	print(GameManager.player_info)
-	print(_get_player_info(next_player_id))
 
 	if _is_everyone_all_in():
 		rpc("_disable_buttons")
@@ -271,11 +266,17 @@ func _everyone_folded_or_checked():
 	return true
 
 func _is_everyone_all_in() -> bool:
-	for id in GameManager.player_id_list:
-		if not _get_player_info(id).get(ACTION) in [Plays.FOLD, Plays.BUSTED, Plays.ALL_IN]:
-			return false
+	var player_count = 0
+	var all_in_count = 0
 
-	return true
+	for id in GameManager.player_id_list:
+		if _get_player_info(id).get(ACTION) == Plays.ALL_IN:
+			all_in_count += 1
+
+		elif not _get_player_info(id).get(ACTION) in [Plays.FOLD, Plays.BUSTED]:
+			player_count += 1
+
+	return player_count >= 0 and all_in_count > 0 
 
 # Player Functions
 puppetsync func _set_chip_count(amount: int) -> void:
@@ -298,7 +299,6 @@ puppetsync func _set_turn(bet_amount: int, nb_action: int) -> void:
 	if _current_bet == 0:
 		_check_button.disabled = false
 		_bet_button.disabled = false
-		_all_in_button.disabled = false
 		_bet_input.editable = true
 			
 	elif _current_bet >= _player_chip_count:
