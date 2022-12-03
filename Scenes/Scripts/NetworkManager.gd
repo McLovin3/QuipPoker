@@ -41,15 +41,6 @@ func create_server() -> void:
 
 
 func _player_connected(id: int) -> void:
-	if players.keys().size() <= 5:
-		get_tree().network_peer.disconnect_peer(id)
-		return
-
-	for id in players:
-		if _username == players[id]:
-			get_tree().network_peer.disconnect_peer(id)
-			return
-			
 	rpc_id(id, "_register_player", _username)
 
 
