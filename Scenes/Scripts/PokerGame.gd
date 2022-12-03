@@ -345,13 +345,13 @@ puppetsync func _change_scene_to_next_game() -> void:
 func _on_FoldButton_pressed():
 	_disable_buttons()
 	_popup_text.display_text("Folded")
-	rpc("_send_action", Plays.FOLD, 0)
+	rpc_id(1, "_send_action", Plays.FOLD, 0)
 
 
 func _on_CheckButton_pressed():
 	_disable_buttons()
 	_popup_text.display_text("Checked")
-	rpc("_send_action", Plays.CHECK, 0)
+	rpc_id(1,"_send_action", Plays.CHECK, 0)
 
 
 func _on_RaiseButton_pressed():
@@ -368,7 +368,7 @@ func _on_RaiseButton_pressed():
 		bet_amount = int(bet_amount) + _current_bet
 		_raise_input.text = ""
 		_disable_buttons()
-		rpc("_send_action", Plays.RAISE, bet_amount)
+		rpc_id(1,"_send_action", Plays.RAISE, bet_amount)
 		_popup_text.display_text("Raised to " + str(bet_amount) + " chips")
 		_set_chip_count(_player_chip_count - bet_amount)
 		_last_puppet_bet_amount = bet_amount
@@ -389,7 +389,7 @@ func _on_BetButton_pressed():
 		_bet_input.text = ""
 		_disable_buttons()
 		_last_puppet_bet_amount = int(bet_amount)
-		rpc("_send_action", Plays.BET, int(bet_amount))
+		rpc_id(1, "_send_action", Plays.BET, int(bet_amount))
 		_popup_text.display_text("Bet " + str(int(bet_amount)) + " chips")
 		_player_chip_count -= int(bet_amount)
 		_set_chip_count(_player_chip_count)
@@ -398,7 +398,7 @@ func _on_BetButton_pressed():
 func _on_AllInButton_pressed():
 	_disable_buttons()
 	_popup_text.display_text("All in")
-	rpc("_send_action", Plays.ALL_IN, _player_chip_count)
+	rpc_id(1, "_send_action", Plays.ALL_IN, _player_chip_count)
 	_set_chip_count(0)
 	_player_chip_count = 0
 
@@ -408,7 +408,7 @@ func _on_CallButton_pressed():
 	_current_bet -= _last_puppet_bet_amount
 	_last_puppet_bet_amount = 0
 	_popup_text.display_text("Called")
-	rpc("_send_action", Plays.CALL, _current_bet)
+	rpc_id(1, "_send_action", Plays.CALL, _current_bet)
 	_player_chip_count -= _current_bet
 	_set_chip_count(_player_chip_count)
 
@@ -503,6 +503,3 @@ func _has_winner() -> bool:
 			players_left += 1
 	
 	return players_left == 1
-
-func _on_TurnTimer_timeout():
-	rpc("_send_action", Plays.FOLD, 0)

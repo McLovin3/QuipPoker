@@ -19,6 +19,7 @@ var QUIPS: Array = [
 ]
 var _players: Array
 var _quip: String
+remote var _last_game_winner
 mastersync var _player_answers: Dictionary = {}
 onready var _popup_text: PopupText = $PopupText
 onready var _quip_label: Label = $QuipLabel
@@ -30,8 +31,10 @@ onready var _quip_list: ItemList = $QuipList
 
 func _ready():
 	if get_tree().is_network_server():
-		_players = GameManager.player_id_list
-		randomize()
+		_last_game_winner = GameManager.last_winner_id
+		rset("_last_game_winner", GameManager.last_winner_id)
+		_players = get_tree().get_network_connected_peers()
+		_players.append(1)
 		_quip = QUIPS[randi() % QUIPS.size()]
 		for id in _players:
 			if id == GameManager.last_winner_id:
@@ -115,6 +118,7 @@ func _on_ConfirmButton_pressed() -> void:
 
 
 func _on_QuipList_item_selected(index:int):
-	var winner_id = _player_answers.keys()[index]
-	rpc_id(1, "_set_winner", winner_id)
+	if get_tree().network_peer.get_unique_id() == _last_game_winner:
+		var winner_id = _player_answers.keys()[index]
+		rpc_id(1, "_set_winner", winner_id)
 
