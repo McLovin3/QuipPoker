@@ -19,7 +19,7 @@ var QUIPS: Array = [
 ]
 var _players: Array
 var _quip: String
-remote var _last_game_winner
+remotesync var _last_game_winner
 mastersync var _player_answers: Dictionary = {}
 onready var _popup_text: PopupText = $PopupText
 onready var _quip_label: Label = $QuipLabel
@@ -69,7 +69,7 @@ mastersync func _set_winner(id : int) -> void:
 	
 
 # Puppet functions
-puppetsync func _set_quip(quip: String, judge: String) -> void:
+remotesync func _set_quip(quip: String, judge: String) -> void:
 	_quip_label.text = quip
 	_guesser_label.text = judge + " will be judging!"
 
